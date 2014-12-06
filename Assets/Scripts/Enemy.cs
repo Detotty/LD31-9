@@ -4,7 +4,15 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 
-public class Enemy : MonoBehaviour {
+public enum EnemyType
+{
+    Elf,
+    Snowman
+}
+
+public class Enemy : MonoBehaviour
+{
+    public EnemyType Type;
 
     public Transform HUD;
     public Transform Sprite;
@@ -34,7 +42,6 @@ public class Enemy : MonoBehaviour {
     private tk2dSpriteAnimator headAnim;
     private tk2dSpriteAnimator hairAnim;
     private tk2dSpriteAnimator clothesAnim;
-    
 
     void Awake()
     {
@@ -121,25 +128,25 @@ public class Enemy : MonoBehaviour {
         {
             legsAnim.Play("Legs_Walk");
             torsoAnim.Play("Torso_Walk");
-            headAnim.Play("Head_1");
-            hairAnim.Play("Hair_1");
+            headAnim.Play("Head");
+            hairAnim.Play("Hair");
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Walk");
             if (!clothesAnim.IsPlaying("Clothes_Attack"))
-                clothesAnim.Play("Clothes_Red_Walk");
+                clothesAnim.Play("Clothes_Walk");
         }
         else
         {
             legsAnim.Play("Legs_Idle");
             torsoAnim.Play("Torso_Walk");
-            headAnim.Play("Head_1");
-            hairAnim.Play("Hair_1");
+            headAnim.Play("Head");
+            hairAnim.Play("Hair");
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Idle");
             if (!clothesAnim.IsPlaying("Clothes_Attack"))
-                clothesAnim.Play("Clothes_Red_Idle");
+                clothesAnim.Play("Clothes_Idle");
         }
     }
 
