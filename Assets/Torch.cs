@@ -32,4 +32,5 @@ public class Torch : MonoBehaviour
         TargetIntensity = Random.Range(MaxIntensity, MinIntensity);
         speed = Random.Range(0.2f, 0.3f);
     }
-}
+
+   }
