@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour {
+public class Enemy : MonoBehaviour {
 
     public Transform HUD;
     public Transform Sprite;
