@@ -240,15 +240,21 @@ public class Player : MonoBehaviour {
                 switch (CurrentWeapon.Class)
                 {
                     case WeaponClass.Melee:
-                        if(!transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+                        if (!transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+                        {
                             transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
+                            Sounds["Footsteps_Light_Snow"].Play();
+                        }
                         break;
                     case WeaponClass.Throw:
                         if (!transform.FindChild("Weapon_Throw").GetComponent<Animation>().isPlaying)
+                        {
                             transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Walk");
+                            Sounds["Footsteps_Light_Snow"].Play();
+                        }
                         break;
                 }
-            
+            Sounds["Footsteps_Light_Snow"].Play();   
         }
         else
         {
@@ -271,6 +277,7 @@ public class Player : MonoBehaviour {
     {
         armsAnim.PlayFromFrame("Arms_Attack",0);
         clothesAnim.PlayFromFrame("Clothes_Red_Attack",0);
+        Sounds["Club"].Play();
     }
 
     public void HitByMelee(Enemy e)
@@ -285,13 +292,15 @@ public class Player : MonoBehaviour {
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
 
+        Sounds["Grunt_Male_pain"].Play();
+
         //rigidbody.AddExplosionForce(100f,p.transform.position,100f,Random.Range(5f, 10f));
         //Knockback = true;
     }
 
     internal void HitByProjectile(Projectile projectile)
     {
-
+        Sounds["Grunt_Male_pain"].Play();
     }
 
     public bool Get(Item item)
