@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SnowMan : Enemy {
+public class Snowman : Enemy {
 
     internal override void Awake()
     {
