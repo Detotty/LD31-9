@@ -43,7 +43,7 @@ public class Spectator : MonoBehaviour
 	    if (currentThrowTime >= ThrowTime&& enableThrow)
 	    {
 	        currentThrowTime = 0f;
-	        if (Random.Range(0, 10) == 0)
+	        if (Random.Range(0, 100) == 0)
 	        {
 	            Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
 	            if (i != null)
