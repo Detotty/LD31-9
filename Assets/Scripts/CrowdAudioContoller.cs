@@ -19,14 +19,10 @@ public class CrowdAudioContoller : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        if (source != null && voiceSource != null&&musicSource!=null)
+        if (source != null && voiceSource != null && musicSource != null)
         {
             StartCrowd();
         }
-       
-
-
-
 
     }
 
@@ -36,21 +32,32 @@ public class CrowdAudioContoller : MonoBehaviour
 
     }
 
+    /*
+     * Queues up and Plays a Random Audio Clip 
+     * 
+     */
+
     IEnumerator QueueCrowd()
     {
         yield return new WaitForSeconds(Random.Range(0.5f, 5.0f));
 
         voiceSource.clip = crowdRandoms[Random.Range(0, crowdRandoms.Length)];
         voiceSource.pitch = Random.Range(0.8f, 1.3f);
-        Debug.Log("Playing Random");
+
         voiceSource.Play();
         StartCoroutine("QueueCrowd");
     }
 
 
+    /*
+     * Start Crowd and Background audio.
+     * 
+     * 
+     */
+
     void StartCrowd()
     {
-       // source.pitch = Random.Range(0.7f, 1.3f);
+        // source.pitch = Random.Range(0.7f, 1.3f);
         source.loop = true;
 
 
