@@ -6,6 +6,7 @@ using UnityEngine;
 
 public enum WeaponType
 {
+    Snowball,
     Stick
 }
 
@@ -20,6 +21,10 @@ public class Weapon
 {
     public WeaponType Type;
     public WeaponClass Class;
+    public ProjectileType ProjectileType;
+    public float Cooldown;
+    public float Knockback;
+    public float Damage;
 
     public float Range;
 
@@ -29,9 +34,19 @@ public class Weapon
 
         switch (type)
         {
+            case WeaponType.Snowball:
+                Class= WeaponClass.Throw;
+                Range = 10f;
+                Cooldown = 0.2f;
+                ProjectileType = ProjectileType.Snowball;
+                Knockback = 100f;
+                break;
             case WeaponType.Stick:
                 Class = WeaponClass.Melee;
                 Range = 1.5f;
+                Cooldown = 0.2f;
+                Knockback = 150f;
+
                 break;
         }
     }

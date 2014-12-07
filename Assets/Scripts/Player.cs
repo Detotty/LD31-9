@@ -33,6 +33,7 @@ public class Player : MonoBehaviour {
     private int faceDir = 1;
     private Vector2 actualSize = new Vector2(4f,4f);
     private float fstepTime = 0f;
+    internal float attackCooldown = 0f;
 
     private tk2dSpriteAnimator legsAnim;
     private tk2dSpriteAnimator torsoAnim;
@@ -58,6 +59,34 @@ public class Player : MonoBehaviour {
         {
             Sounds.Add(a.clip.name, a);
         }
+
+        SetWeapon(WeaponType.Snowball);
+    }
+
+    private void SetWeapon(WeaponType type)
+    {
+        CurrentWeapon = new Weapon(type);
+
+        transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
+        transform.FindChild("Weapon_Throw").gameObject.SetActive(false);
+        //transform.FindChild("Weapon_Use").gameObject.SetActive(false);
+
+        switch (CurrentWeapon.Class)
+        {
+            case WeaponClass.Melee:
+                transform.FindChild("Weapon_Swipe").gameObject.SetActive(true);
+                transform.FindChild("Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                break;
+            case WeaponClass.Throw:
+                transform.FindChild("Weapon_Throw").gameObject.SetActive(true);
+                transform.FindChild("Weapon_Throw").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                break;
+            case WeaponClass.Use:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        
     }
 
     void Update()
@@ -107,21 +136,26 @@ public class Player : MonoBehaviour {
             }
         }
 
-        ToggleWalk(rigidbody.velocity.magnitude > 0f);
+        ToggleWalk(rigidbody.velocity.magnitude > 0.01f);
      
         Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 0.25f);
 
-        if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null)
+        attackCooldown -= Time.deltaTime;
+        if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null && attackCooldown<=0f)
         {
             switch (CurrentWeapon.Class)
             {
                 case WeaponClass.Melee:
                     transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
                     AttackAnim("Attack");
-
+                    break;
+                case WeaponClass.Throw:
+                    transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
+                    AttackAnim("Attack");
                     break;
             }
 
+            attackCooldown = CurrentWeapon.Cooldown;
             StartCoroutine("DoAttack");
         }
         if (Input.GetButtonDown("P1 Throw") && CurrentWeapon != null)
@@ -129,10 +163,10 @@ public class Player : MonoBehaviour {
             switch (CurrentWeapon.Class)
             {
                 case WeaponClass.Melee:
-                    transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
+                    //transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
                     break;
             }
-            CurrentWeapon = null;
+            SetWeapon(WeaponType.Snowball);
 
             Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
             if (i != null)
@@ -164,6 +198,14 @@ public class Player : MonoBehaviour {
                         e.HitByMelee(this);
                 break;
             case WeaponClass.Throw:
+                Projectile p = ProjectileManager.Instance.Spawn(CurrentWeapon.ProjectileType, transform.position + new Vector3((float)faceDir * 0.3f, 1f, 0f), this);
+                if (p != null)
+                {
+                    Vector3 throwVelocity = (transform.position + new Vector3((float)faceDir * (CurrentWeapon.Range * 0.5f), 0f, 0f) - transform.position);
+                    throwVelocity *= CurrentWeapon.Range * 0.5f;
+                    throwVelocity.y = CurrentWeapon.Range;
+                    p.rigidbody.velocity = throwVelocity;
+                }
                 break;
             case WeaponClass.Use:
                 break;
@@ -186,8 +228,19 @@ public class Player : MonoBehaviour {
             if (!clothesAnim.IsPlaying("Clothes_Red_Attack"))
                 clothesAnim.Play("Clothes_Red_Walk");
 
-            if (CurrentWeapon != null && !transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
-                transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
+            if (CurrentWeapon != null)
+                switch (CurrentWeapon.Class)
+                {
+                    case WeaponClass.Melee:
+                        if(!transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+                            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
+                        break;
+                    case WeaponClass.Throw:
+                        if (!transform.FindChild("Weapon_Throw").GetComponent<Animation>().isPlaying)
+                            transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Walk");
+                        break;
+                }
+            
         }
         else
         {
@@ -202,6 +255,7 @@ public class Player : MonoBehaviour {
                 clothesAnim.Play("Clothes_Red_Idle");
 
             transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
+            transform.FindChild("Weapon_Throw").GetComponent<Animation>().Stop("Weapon_Walk");
         }
     }
 
@@ -220,11 +274,16 @@ public class Player : MonoBehaviour {
         hitAngle.Normalize();
 
         //Vector3 forceHit = (transform.position - p.transform.position).normalized * 20f;
-        rigidbody.AddForceAtPosition(hitAngle * 50f, transform.position);
+        rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
 
         //rigidbody.AddExplosionForce(100f,p.transform.position,100f,Random.Range(5f, 10f));
         //Knockback = true;
+    }
+
+    internal void HitByProjectile(Projectile projectile)
+    {
+
     }
 
     public bool Get(Item item)
@@ -232,17 +291,18 @@ public class Player : MonoBehaviour {
         switch (item.Type)
         {
             case ItemType.Weapon:
-                if(CurrentWeapon!=null) return false;
+                if((CurrentWeapon!=null && CurrentWeapon.Type!=WeaponType.Snowball)) return false;
 
-                CurrentWeapon = new Weapon(item.WeaponType);
+                SetWeapon(item.WeaponType);
+                //CurrentWeapon = new Weapon(item.WeaponType);
 
-                switch (CurrentWeapon.Class)
-                {
-                    case WeaponClass.Melee:
-                        transform.FindChild("Weapon_Swipe").gameObject.SetActive(true);
-                        transform.FindChild("Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
-                        break;
-                }
+
+                //switch (CurrentWeapon.Class)
+                //{
+                //    case WeaponClass.Melee:
+                //        SetWeapon(WeaponType.Snowball);
+                //        break;
+                //}
 
                 break;
         }
@@ -250,7 +310,9 @@ public class Player : MonoBehaviour {
         return true;
     }
 
-    
 
-  
+
+
+
+ 
 }

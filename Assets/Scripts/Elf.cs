@@ -16,7 +16,9 @@ class Elf : Enemy
 
             base.Awake();
 
-            Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 7f);
+            CooldownModifier = 2f;
+
+            Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
             Target.y = 0f;
         }
     }

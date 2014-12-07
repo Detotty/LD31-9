@@ -1,9 +1,8 @@
 fileFormatVersion: 2
-guid: b8ec66f7ea37395478b55ee02d41b19c
+guid: 7f3009f048ecd544196463b25ec38919
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Stick
-    21300002: Snowball
+    21300000: PROGRAMMER_ART_PROJECTILES_0
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -45,17 +44,7 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: Stick
-      rect:
-        serializedVersion: 2
-        x: 5
-        y: 0
-        width: 6
-        height: 16
-      alignment: 7
-      pivot: {x: .5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: Snowball
+    - name: PROGRAMMER_ART_PROJECTILES_0
       rect:
         serializedVersion: 2
         x: 19
