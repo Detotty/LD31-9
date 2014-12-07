@@ -29,6 +29,7 @@ public class Enemy : MonoBehaviour
     public Weapon CurrentWeapon = null;
 
     // States
+    public bool Knockback = false;
 
     // Stats
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
@@ -86,13 +87,15 @@ public class Enemy : MonoBehaviour
 
         //if (Vector3.Distance(Target, transform.position) > 0.05f)
         //{
-            if (Vector3.Distance(Target, transform.position) < 0.1f)
-                Target = transform.position;
-            else
-                rigidbody.velocity = transform.TransformDirection((Target-transform.position).normalized) * Speed;
+        if (Vector3.Distance(Target, transform.position) < 0.1f)
+            Target = transform.position;
+        else
+            rigidbody.velocity = transform.TransformDirection((Target-transform.position).normalized) * Speed;
 
-            
+         
         //}
+
+        
 
         if (rigidbody.velocity.magnitude > 0f)
         {
@@ -143,6 +146,16 @@ public class Enemy : MonoBehaviour
 
     }
 
+    public void HitByMelee(Player p)
+    {
+        //Vector3 hitAngle = (p.transform.position - transform.position);
+        //hitAngle.y = Random.Range(0.1f, 0.8f);
+        //hitAngle.Normalize();
+        
+        rigidbody.AddExplosionForce(100f,p.transform.position,100f,Random.Range(5f, 10f));
+        Knockback = true;
+    }
+
     internal virtual void ToggleWalk(bool walk)
     {
         if (walk)
@@ -182,7 +195,7 @@ public class Enemy : MonoBehaviour
 
                 switch (CurrentWeapon.Class)
                 {
-                    case WeaponClass.Swipe:
+                    case WeaponClass.Melee:
                         transform.FindChild("Weapon_Swipe").gameObject.SetActive(true);
                         transform.FindChild("Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
                         break;

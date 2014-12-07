@@ -11,7 +11,7 @@ public enum WeaponType
 
 public enum WeaponClass
 {
-    Swipe,
+    Melee,
     Throw,
     Use
 }
@@ -21,6 +21,8 @@ public class Weapon
     public WeaponType Type;
     public WeaponClass Class;
 
+    public float Range;
+
     public Weapon(WeaponType type)
     {
         Type = type;
@@ -28,7 +30,8 @@ public class Weapon
         switch (type)
         {
             case WeaponType.Stick:
-                Class = WeaponClass.Swipe;
+                Class = WeaponClass.Melee;
+                Range = 2f;
                 break;
         }
     }
