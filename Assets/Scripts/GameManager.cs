@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour {
 
@@ -30,8 +32,7 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        // dummy enemy list
-	    for (int i = 0; i < 5; i++) spawnList.Add(EnemyType.Elf);
+        CreateSpawnList();
 	}
 	
 	// Update is called once per frame
@@ -76,7 +77,11 @@ public class GameManager : MonoBehaviour {
     {
         for (int i = 0; i < 5 + Wave; i++)
         {
-            spawnList.Add(EnemyType.Elf);
+            EnemyType newE = EnemyType.Elf;
+            if(Wave>=1)
+                if(Random.Range(0,3)==0) newE = EnemyType.Snowman;
+
+            spawnList.Add(newE);
         }
     }
 }

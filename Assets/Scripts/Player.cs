@@ -281,17 +281,20 @@ public class Player : MonoBehaviour {
         hitAngle.y = Random.Range(0.5f, 1.5f);
         hitAngle.Normalize();
 
-        //Vector3 forceHit = (transform.position - p.transform.position).normalized * 20f;
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
-
-        //rigidbody.AddExplosionForce(100f,p.transform.position,100f,Random.Range(5f, 10f));
-        //Knockback = true;
     }
 
     internal void HitByProjectile(Projectile projectile)
     {
+        if (Knockback) return;
 
+        Vector3 hitAngle = (transform.position - projectile.transform.position);
+        hitAngle.y = Random.Range(0.5f, 1.5f);
+        hitAngle.Normalize();
+
+        rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
+        Knockback = true;
     }
 
     public bool Get(Item item)

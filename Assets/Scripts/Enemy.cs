@@ -38,6 +38,8 @@ public class Enemy : MonoBehaviour
     public float CooldownModifier;
     public float BaseHealth;
     public float Health;
+    public bool CanUseWeapons;
+        
 
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
 
@@ -61,7 +63,7 @@ public class Enemy : MonoBehaviour
     internal Player p1;
     internal Player p2;
 
-    private int faceDir = 1;
+    internal int faceDir = 1;
 
     internal virtual void Awake()
     {
@@ -71,8 +73,8 @@ public class Enemy : MonoBehaviour
         torsoAnim = transform.FindChild("Torso").GetComponent<tk2dSpriteAnimator>();
         armsAnim = transform.FindChild("Arms").GetComponent<tk2dSpriteAnimator>();
         headAnim = transform.FindChild("Head").GetComponent<tk2dSpriteAnimator>();
-        hairAnim = transform.FindChild("Hair").GetComponent<tk2dSpriteAnimator>();
-        clothesAnim = transform.FindChild("Clothes").GetComponent<tk2dSpriteAnimator>();
+        
+        
 
         GameObject soundsObject = transform.FindChild("Audio").gameObject;
         foreach (AudioSource a in soundsObject.GetComponents<AudioSource>())
@@ -85,7 +87,8 @@ public class Enemy : MonoBehaviour
 
         arena = GameObject.Find("Arena").transform;
 
-        SetWeapon(WeaponType.Snowball);
+        if(CanUseWeapons)
+            SetWeapon(WeaponType.Snowball);
     }
 
     internal virtual void Update()
@@ -154,51 +157,7 @@ public class Enemy : MonoBehaviour
 
         // ARTIFICIAL INTELLIGENCE YO
         // Attack
-        attackCooldown -= Time.deltaTime;
-
-        if (CurrentWeapon != null && attackCooldown<=0f)
-        {
-            if (Vector3.Distance(transform.position, p1.transform.position) < CurrentWeapon.Range)
-            {
-                if (CurrentWeapon != null)
-                {
-                    switch (CurrentWeapon.Class)
-                    {
-                        case WeaponClass.Melee:
-                            
-                                transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
-                                AttackAnim("Attack");
-                                attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
-                                StartCoroutine("DoAttack");
-                            
-                            break;
-                        case WeaponClass.Throw:
-                            Vector3 forward = new Vector3(faceDir,0f,0f).normalized;
-                            if (Vector3.Angle(p1.transform.position - transform.position,forward) < 10f)
-                            {
-                                transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
-                                AttackAnim("Attack");
-                                attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
-                                StartCoroutine("DoAttack");
-                            }
-
-                            break;
-                    }
-
-                    
-                }
-            }
-        }
-
-        // Movement
-        if (Vector3.Distance(transform.position, Target) < 0.01f)
-        {
-            if (Random.Range(0, 100)==0)
-            {
-                Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
-                Target.y = 0f;
-            }
-        }
+        DoAI();
 
 
         //if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null)
@@ -236,6 +195,55 @@ public class Enemy : MonoBehaviour
         }
 
         if (Health < 0f) Dead = true;
+    }
+
+    internal virtual void DoAI()
+    {
+        attackCooldown -= Time.deltaTime;
+
+        if (CurrentWeapon != null && attackCooldown <= 0f)
+        {
+            if (Vector3.Distance(transform.position, p1.transform.position) < CurrentWeapon.Range)
+            {
+                if (CurrentWeapon != null)
+                {
+                    switch (CurrentWeapon.Class)
+                    {
+                        case WeaponClass.Melee:
+
+                            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                            AttackAnim("Attack");
+                            attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
+                            StartCoroutine("DoAttack");
+
+                            break;
+                        case WeaponClass.Throw:
+                            Vector3 forward = new Vector3(faceDir, 0f, 0f).normalized;
+                            if (Vector3.Angle(p1.transform.position - transform.position, forward) < 10f)
+                            {
+                                transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
+                                AttackAnim("Attack");
+                                attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
+                                StartCoroutine("DoAttack");
+                            }
+
+                            break;
+                    }
+
+
+                }
+            }
+        }
+
+        // Movement
+        if (Vector3.Distance(transform.position, Target) < 0.01f)
+        {
+            if (Random.Range(0, 100) == 0)
+            {
+                Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
+                Target.y = 0f;
+            }
+        }
     }
 
     private IEnumerator DoAttack()

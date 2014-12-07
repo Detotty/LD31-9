@@ -14,6 +14,8 @@ public class Spectator : MonoBehaviour
 
     public Transform Sprite;
     private float turntarget = 5f;
+
+    private float rotateTarget = 0f;
     
 
 	// Use this for initialization
@@ -22,16 +24,16 @@ public class Spectator : MonoBehaviour
 
         if (arenaCenter.transform.position.x > transform.position.x)
         {
-            turntarget = 5;
+            turntarget = 7;
            
         }
         if (arenaCenter.transform.position.x < transform.position.x)
         {
-            turntarget = -5;
+            turntarget = -7;
            
         }
 
-        Sprite.localScale =  new Vector3(turntarget, 5, 1f);
+        Sprite.localScale =  new Vector3(turntarget, 7, 1f);
 
 
 	}
@@ -39,6 +41,13 @@ public class Spectator : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
+        Sprite.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f, 0f, rotateTarget), Time.deltaTime * 10f);
+
+	    if (Random.Range(0, 50) == 0)
+	    {
+	        rotateTarget = Random.Range(-20f, 20f);
+	    }
+
 	    currentThrowTime += Time.deltaTime;
 	    if (currentThrowTime >= ThrowTime&& enableThrow)
 	    {

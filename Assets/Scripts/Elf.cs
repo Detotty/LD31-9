@@ -14,12 +14,16 @@ class Elf : Enemy
             hairStyle = Random.Range(0, 3) + 1;
             headStyle = Random.Range(0, 3) + 1;
 
-            base.Awake();
+            hairAnim = transform.FindChild("Hair").GetComponent<tk2dSpriteAnimator>();
+            clothesAnim = transform.FindChild("Clothes").GetComponent<tk2dSpriteAnimator>();
 
             CooldownModifier = 2f;
 
             BaseHealth = 10f;
             Health = BaseHealth;
+            CanUseWeapons = true;
+
+            base.Awake();
 
             Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
             Target.y = 0f;
