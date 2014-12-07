@@ -36,6 +36,11 @@ public class Item : MonoBehaviour
             if(other.GetComponent<Player>().Get(this)) 
                 gameObject.SetActive(false);
         }
+        if (other.GetComponent<Enemy>() != null)
+        {
+            if (other.GetComponent<Enemy>().Get(this))
+                gameObject.SetActive(false);
+        }
     }
 
     internal void Init(ItemType type, WeaponType w)

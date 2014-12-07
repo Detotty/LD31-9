@@ -9,6 +9,7 @@ public class EnemyManager : MonoBehaviour {
     public static EnemyManager Instance;
 
     public GameObject ElfPrefab;
+    public List<Transform> Doors = new List<Transform>(); 
 
     public List<Enemy> Enemies = new List<Enemy>();
 
@@ -42,6 +43,7 @@ public class EnemyManager : MonoBehaviour {
             case EnemyType.Elf:
                 e = ((GameObject)Instantiate(ElfPrefab)).GetComponent<Elf>();
                 e.transform.parent = transform;
+                e.transform.position = Doors[Random.Range(0, 3)].position;
                 Enemies.Add(e);
                 break;
             case EnemyType.Snowman:

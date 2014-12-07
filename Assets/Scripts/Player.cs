@@ -34,7 +34,7 @@ public class Player : MonoBehaviour {
     private tk2dSpriteAnimator headAnim;
     private tk2dSpriteAnimator hairAnim;
     private tk2dSpriteAnimator clothesAnim;
-    
+
 
     void Awake()
     {
@@ -89,6 +89,7 @@ public class Player : MonoBehaviour {
             {
                 case WeaponClass.Swipe:
                     transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                    AttackAnim("Attack");
                     break;
             }
         }
@@ -126,8 +127,11 @@ public class Player : MonoBehaviour {
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Walk");
-            if (!clothesAnim.IsPlaying("Clothes_Attack"))
+            if (!clothesAnim.IsPlaying("Clothes_Red_Attack"))
                 clothesAnim.Play("Clothes_Red_Walk");
+
+            if (CurrentWeapon != null && !transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+                transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
         }
         else
         {
@@ -138,9 +142,17 @@ public class Player : MonoBehaviour {
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Idle");
-            if (!clothesAnim.IsPlaying("Clothes_Attack"))
+            if (!clothesAnim.IsPlaying("Clothes_Red_Attack"))
                 clothesAnim.Play("Clothes_Red_Idle");
+
+            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
         }
+    }
+
+    void AttackAnim(string anim)
+    {
+        armsAnim.PlayFromFrame("Arms_Attack",0);
+        clothesAnim.PlayFromFrame("Clothes_Red_Attack",0);
     }
 
     public bool Get(Item item)

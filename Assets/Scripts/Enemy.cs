@@ -17,7 +17,8 @@ public class Enemy : MonoBehaviour
     public Transform HUD;
     public Transform Sprite;
     public Sprite WeaponSheet;
-        
+
+    public Vector3 Target;
 
 	// "Physics"
     public float walkSpeed = 0.000001f;
@@ -30,20 +31,28 @@ public class Enemy : MonoBehaviour
     // States
 
     // Stats
-    public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();  
+    public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
 
-    private float turntarget = 12f;
-    private Vector2 actualSize = new Vector2(4f,4f);
-    private float fstepTime = 0f;
+    internal float turntarget = 12f;
+    internal Vector2 actualSize = new Vector2(4f,4f);
+    internal float fstepTime = 0f;
 
-    private tk2dSpriteAnimator legsAnim;
-    private tk2dSpriteAnimator torsoAnim;
-    private tk2dSpriteAnimator armsAnim;
-    private tk2dSpriteAnimator headAnim;
-    private tk2dSpriteAnimator hairAnim;
-    private tk2dSpriteAnimator clothesAnim;
+    internal Transform arena;
 
-    void Awake()
+    internal tk2dSpriteAnimator legsAnim;
+    internal tk2dSpriteAnimator torsoAnim;
+    internal tk2dSpriteAnimator armsAnim;
+    internal tk2dSpriteAnimator headAnim;
+    internal tk2dSpriteAnimator hairAnim;
+    internal tk2dSpriteAnimator clothesAnim;
+
+    internal int headStyle = 0;
+    internal int hairStyle = 0;
+
+    internal Player p1;
+    internal Player p2;
+
+    internal virtual void Awake()
     {
         turntarget = actualSize.x;
 
@@ -59,19 +68,31 @@ public class Enemy : MonoBehaviour
         {
             Sounds.Add(a.clip.name, a);
         }
+
+        p1 = GameObject.Find("Kid").GetComponent<Player>();
+        //p2 = GameObject.Find("Kid").GetComponent<Player>();
+
+        arena = GameObject.Find("Arena").transform;
     }
 
-    void Update()
+    internal virtual void Update()
     {
-        //Input
-        float h = Input.GetAxis("P1 Horizontal");
-        float v = Input.GetAxis("P1 Vertical");
 
-        if (h > 0f) turntarget = actualSize.x;
-        if (h < 0f) turntarget = -actualSize.x;
+
+        if (p1.transform.position.x > transform.position.x) turntarget = actualSize.x;
+        if (p1.transform.position.x < transform.position.x) turntarget = -actualSize.x;
 
         Speed = walkSpeed;
-        rigidbody.velocity = transform.TransformDirection(new Vector3(h, 0, v).normalized) * Speed;
+
+        //if (Vector3.Distance(Target, transform.position) > 0.05f)
+        //{
+            if (Vector3.Distance(Target, transform.position) < 0.1f)
+                Target = transform.position;
+            else
+                rigidbody.velocity = transform.TransformDirection((Target-transform.position).normalized) * Speed;
+
+            
+        //}
 
         if (rigidbody.velocity.magnitude > 0f)
         {
@@ -85,51 +106,51 @@ public class Enemy : MonoBehaviour
 
         //if (!anim.IsPlaying("MonsterLadderTransferOn") && !anim.IsPlaying("MonsterLadderTransferOff"))
         //{
-        ToggleWalk(rigidbody.velocity.magnitude > 0f);
+        ToggleWalk(rigidbody.velocity.magnitude > 0.5f);
         //}
      
         Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 0.25f);
 
-        if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null)
-        {
-            switch (CurrentWeapon.Class)
-            {
-                case WeaponClass.Swipe:
-                    transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
-                    break;
-            }
-        }
-        if (Input.GetButtonDown("P1 Throw") && CurrentWeapon != null)
-        {
-            switch (CurrentWeapon.Class)
-            {
-                case WeaponClass.Swipe:
-                    transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
-                    break;
-            }
-            CurrentWeapon = null;
+        //if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null)
+        //{
+        //    switch (CurrentWeapon.Class)
+        //    {
+        //        case WeaponClass.Swipe:
+        //            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+        //            break;
+        //    }
+        //}
+        //if (Input.GetButtonDown("P1 Throw") && CurrentWeapon != null)
+        //{
+        //    switch (CurrentWeapon.Class)
+        //    {
+        //        case WeaponClass.Swipe:
+        //            transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
+        //            break;
+        //    }
+        //    CurrentWeapon = null;
 
-            Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
-            if (i != null)
-            {
-                i.transform.position = transform.position + new Vector3(turntarget<0f?-1f:1f,1f,0f);
-                Vector3 throwVelocity = new Vector3(turntarget<0f?-7f:7f,3f,0f);
-                i.rigidbody.velocity = throwVelocity;
-            }
+        //    Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
+        //    if (i != null)
+        //    {
+        //        i.transform.position = transform.position + new Vector3(turntarget<0f?-1f:1f,1f,0f);
+        //        Vector3 throwVelocity = new Vector3(turntarget<0f?-7f:7f,3f,0f);
+        //        i.rigidbody.velocity = throwVelocity;
+        //    }
 
-        }
+        //}
 
 
     }
 
-    void ToggleWalk(bool walk)
+    internal virtual void ToggleWalk(bool walk)
     {
         if (walk)
         {
             legsAnim.Play("Legs_Walk");
             torsoAnim.Play("Torso_Walk");
-            headAnim.Play("Head");
-            hairAnim.Play("Hair");
+            headAnim.Play("Head_" + headStyle);
+            hairAnim.Play("Hair_" + hairStyle);
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Walk");
@@ -140,8 +161,8 @@ public class Enemy : MonoBehaviour
         {
             legsAnim.Play("Legs_Idle");
             torsoAnim.Play("Torso_Walk");
-            headAnim.Play("Head");
-            hairAnim.Play("Hair");
+            headAnim.Play("Head_" + headStyle);
+            hairAnim.Play("Hair_" + hairStyle);
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Idle");

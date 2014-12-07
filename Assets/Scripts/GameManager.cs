@@ -10,9 +10,12 @@ public class GameManager : MonoBehaviour {
     public int Wave = 1;
     public float WaveStartDelay = 5f;
     public bool WaveInProgress = false;
+    public float SpawnDelay = 0.5f;
+  
 
     List<EnemyType> spawnList = new List<EnemyType>();
     private float startTimer = 0f;
+    private float spawnTimer = 0f;
 
 	// Use this for initialization
 	void Start () {
@@ -41,7 +44,19 @@ public class GameManager : MonoBehaviour {
 	            startTimer = 0f;
 	            WaveInProgress = true;
 	        }
+
+	        return;
 	    }
 
+	    if (spawnList.Count > 0)
+	    {
+	        spawnTimer += Time.deltaTime;
+	        if (spawnTimer >= SpawnDelay)
+	        {
+	            spawnTimer = 0f;
+	            EnemyManager.Instance.Spawn(spawnList[spawnList.Count-1]);
+                spawnList.RemoveAt(spawnList.Count - 1);
+	        }
+	    }
 	}
 }
