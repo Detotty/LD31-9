@@ -243,18 +243,18 @@ public class Player : MonoBehaviour {
                         if (!transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
                         {
                             transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
-                            Sounds["Footsteps_Light_Snow"].Play();
+                            startWalkingAudio(Sounds["Footsteps_Light_Snow"]);
                         }
                         break;
                     case WeaponClass.Throw:
                         if (!transform.FindChild("Weapon_Throw").GetComponent<Animation>().isPlaying)
                         {
                             transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Walk");
-                            Sounds["Footsteps_Light_Snow"].Play();
+                            startWalkingAudio(Sounds["Footsteps_Light_Snow"]);
                         }
                         break;
                 }
-            Sounds["Footsteps_Light_Snow"].Play();   
+            startWalkingAudio(Sounds["Footsteps_Light_Snow"]);  
         }
         else
         {
@@ -270,6 +270,27 @@ public class Player : MonoBehaviour {
 
             transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
             transform.FindChild("Weapon_Throw").GetComponent<Animation>().Stop("Weapon_Walk");
+            stopWalkingAudio(Sounds["Footsteps_Light_Snow"]);
+        }
+    }
+
+    private void startWalkingAudio(AudioSource source)
+    {
+
+        if (!source.isPlaying)
+        {
+            source.loop = true;
+            source.Play();
+        }
+    }
+
+    private void stopWalkingAudio(AudioSource source)
+    {
+
+        if (rigidbody.velocity.sqrMagnitude < 0.01f)
+        {
+            //Debug.Log("Stopping Player Audio" + source.clip.name);
+            source.loop = false;
         }
     }
 
