@@ -4,6 +4,7 @@ using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Player : MonoBehaviour {
 
@@ -23,6 +24,7 @@ public class Player : MonoBehaviour {
     public Weapon CurrentWeapon = null;
 
     // States
+    public bool Knockback = false;
 
     // Stats
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();  
@@ -76,7 +78,15 @@ public class Player : MonoBehaviour {
         }
 
         //Speed = walkSpeed;
-        rigidbody.velocity = transform.TransformDirection(new Vector3(h, 0, v).normalized) * walkSpeed;
+        //rigidbody.velocity = transform.TransformDirection(new Vector3(h, 0, v).normalized) * walkSpeed;
+
+        if (!Knockback && new Vector3(h, 0, v).normalized.magnitude>0f)
+            rigidbody.velocity = transform.TransformDirection(new Vector3(h, 0, v).normalized) * walkSpeed;
+
+        if (Knockback && rigidbody.velocity.magnitude < 0.3f)
+        {
+            Knockback = false;
+        }
 
         //rigidbody.AddForce(new Vector3(h, 0, v).normalized);
 
@@ -148,7 +158,7 @@ public class Player : MonoBehaviour {
         switch (CurrentWeapon.Class)
         {
             case WeaponClass.Melee:
-                Vector3 testPos = transform.position + new Vector3((float)faceDir * 1f, 1f, 0f);
+                Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
                 foreach(Enemy e in EnemyManager.Instance.Enemies)
                     if (Vector3.Distance(testPos, e.transform.position) < CurrentWeapon.Range)
                         e.HitByMelee(this);
@@ -199,6 +209,22 @@ public class Player : MonoBehaviour {
     {
         armsAnim.PlayFromFrame("Arms_Attack",0);
         clothesAnim.PlayFromFrame("Clothes_Red_Attack",0);
+    }
+
+    public void HitByMelee(Enemy e)
+    {
+        if (Knockback) return;
+
+        Vector3 hitAngle = (transform.position - e.transform.position);
+        hitAngle.y = Random.Range(0.5f, 1.5f);
+        hitAngle.Normalize();
+
+        //Vector3 forceHit = (transform.position - p.transform.position).normalized * 20f;
+        rigidbody.AddForceAtPosition(hitAngle * 50f, transform.position);
+        Knockback = true;
+
+        //rigidbody.AddExplosionForce(100f,p.transform.position,100f,Random.Range(5f, 10f));
+        //Knockback = true;
     }
 
     public bool Get(Item item)

@@ -29,10 +29,9 @@ public class Spectator : MonoBehaviour
 	            {
 	                i.transform.position = transform.position;
 	                Vector3 throwVelocity = ((arenaCenter.position + (Random.insideUnitSphere*7f)) - transform.position);
-	                throwVelocity *= 0.5f;
-	                throwVelocity.y = 5f;
+	                throwVelocity *= 0.6f;
+	                throwVelocity.y = 6f;
                     i.rigidbody.velocity = throwVelocity;
-                    
 	            }
 	        }
 	    }

@@ -31,7 +31,7 @@ public class Weapon
         {
             case WeaponType.Stick:
                 Class = WeaponClass.Melee;
-                Range = 2f;
+                Range = 1.5f;
                 break;
         }
     }

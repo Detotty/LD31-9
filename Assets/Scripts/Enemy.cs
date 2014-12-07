@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public enum EnemyType
 {
@@ -53,6 +55,8 @@ public class Enemy : MonoBehaviour
     internal Player p1;
     internal Player p2;
 
+    private int faceDir = 1;
+
     internal virtual void Awake()
     {
         turntarget = actualSize.x;
@@ -80,19 +84,30 @@ public class Enemy : MonoBehaviour
     {
 
 
-        if (p1.transform.position.x > transform.position.x) turntarget = actualSize.x;
-        if (p1.transform.position.x < transform.position.x) turntarget = -actualSize.x;
+        if (p1.transform.position.x > transform.position.x)
+        {
+            turntarget = actualSize.x;
+            faceDir = 1;
+        }
+        if (p1.transform.position.x < transform.position.x)
+        {
+            turntarget = -actualSize.x;
+            faceDir = -1;
+        }
 
         Speed = walkSpeed;
 
         //if (Vector3.Distance(Target, transform.position) > 0.05f)
         //{
-        if (Vector3.Distance(Target, transform.position) < 0.1f)
+        if (!Knockback && Vector3.Distance(Target, transform.position) < 0.2f)
             Target = transform.position;
-        else
-            rigidbody.velocity = transform.TransformDirection((Target-transform.position).normalized) * Speed;
-
-         
+        else if (!Knockback)
+            rigidbody.velocity = transform.TransformDirection((Target - transform.position).normalized) * Speed;
+       
+        if (Knockback && rigidbody.velocity.magnitude < 0.1f)
+        {
+            Knockback = false;
+        }
         //}
 
         
@@ -113,6 +128,30 @@ public class Enemy : MonoBehaviour
         //}
      
         Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 0.25f);
+
+        // ARTIFICIAL INTELLIGENCE YO
+
+        // Attack
+        if (CurrentWeapon != null)
+        {
+            if (Vector3.Distance(transform.position, p1.transform.position) < CurrentWeapon.Range)
+            {
+                if (CurrentWeapon != null)
+                {
+                    switch (CurrentWeapon.Class)
+                    {
+                        case WeaponClass.Melee:
+                            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                            AttackAnim("Attack");
+
+                            break;
+                    }
+
+                    StartCoroutine("DoAttack");
+                }
+            }
+        }
+
 
         //if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null)
         //{
@@ -146,14 +185,40 @@ public class Enemy : MonoBehaviour
 
     }
 
+    private IEnumerator DoAttack()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        switch (CurrentWeapon.Class)
+        {
+            case WeaponClass.Melee:
+                Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
+                    if (Vector3.Distance(testPos, p1.transform.position) < CurrentWeapon.Range)
+                        p1.HitByMelee(this);
+                break;
+            case WeaponClass.Throw:
+                break;
+            case WeaponClass.Use:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
     public void HitByMelee(Player p)
     {
-        //Vector3 hitAngle = (p.transform.position - transform.position);
-        //hitAngle.y = Random.Range(0.1f, 0.8f);
-        //hitAngle.Normalize();
-        
-        rigidbody.AddExplosionForce(100f,p.transform.position,100f,Random.Range(5f, 10f));
+        if (Knockback) return;
+
+        Vector3 hitAngle = (transform.position - p.transform.position);
+        hitAngle.y = Random.Range(0.5f, 1.5f);
+        hitAngle.Normalize();
+
+        //Vector3 forceHit = (transform.position - p.transform.position).normalized * 20f;
+        rigidbody.AddForceAtPosition(hitAngle * 50f, transform.position);
         Knockback = true;
+
+        //rigidbody.AddExplosionForce(100f,p.transform.position,100f,Random.Range(5f, 10f));
+        //Knockback = true;
     }
 
     internal virtual void ToggleWalk(bool walk)
@@ -165,10 +230,13 @@ public class Enemy : MonoBehaviour
             headAnim.Play("Head_" + headStyle);
             hairAnim.Play("Hair_" + hairStyle);
 
-            if (!armsAnim.IsPlaying("Arms_Attack"))
+            //if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Walk");
-            if (!clothesAnim.IsPlaying("Clothes_Attack"))
+            //if (!clothesAnim.IsPlaying("Clothes_Attack"))
                 clothesAnim.Play("Clothes_Walk");
+
+            if (CurrentWeapon != null && !transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+                transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
         }
         else
         {
@@ -177,11 +245,19 @@ public class Enemy : MonoBehaviour
             headAnim.Play("Head_" + headStyle);
             hairAnim.Play("Hair_" + hairStyle);
 
-            if (!armsAnim.IsPlaying("Arms_Attack"))
+            //if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Idle");
-            if (!clothesAnim.IsPlaying("Clothes_Attack"))
+            //if (!clothesAnim.IsPlaying("Clothes_Attack"))
                 clothesAnim.Play("Clothes_Idle");
+
+            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
         }
+    }
+
+    internal virtual void AttackAnim(string anim)
+    {
+        //armsAnim.PlayFromFrame("Arms_Attack", 0);
+        //clothesAnim.PlayFromFrame("Clothes_Attack", 0);
     }
 
     public bool Get(Item item)
