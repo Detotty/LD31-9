@@ -25,6 +25,7 @@ public class Weapon
     public float Cooldown;
     public float Knockback;
     public float Damage;
+    public int Durability;
 
     public float Range;
 
@@ -40,13 +41,16 @@ public class Weapon
                 Cooldown = 0.2f;
                 ProjectileType = ProjectileType.Snowball;
                 Knockback = 100f;
+                Durability = -1;
+                Damage = 3f;
                 break;
             case WeaponType.Stick:
                 Class = WeaponClass.Melee;
                 Range = 1.5f;
                 Cooldown = 0.2f;
                 Knockback = 150f;
-
+                Durability = 20;
+                Damage = 3f;
                 break;
         }
     }

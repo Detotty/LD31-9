@@ -2,6 +2,7 @@
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class GameManager : MonoBehaviour {
 
@@ -47,6 +48,7 @@ public class GameManager : MonoBehaviour {
 
 	        return;
 	    }
+	   
 
 	    if (spawnList.Count > 0)
 	    {
@@ -58,5 +60,23 @@ public class GameManager : MonoBehaviour {
                 spawnList.RemoveAt(spawnList.Count - 1);
 	        }
 	    }
+	    else
+	    {
+            if (EnemyManager.Instance.Enemies.Count(en => !en.Dead) == 0)
+            {
+                CreateSpawnList();
+                WaveInProgress = false;
+                Wave++;
+                startTimer = 0f;
+            }
+	    }
 	}
+
+    void CreateSpawnList()
+    {
+        for (int i = 0; i < 5 + Wave; i++)
+        {
+            spawnList.Add(EnemyType.Elf);
+        }
+    }
 }

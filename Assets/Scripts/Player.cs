@@ -180,8 +180,11 @@ public class Player : MonoBehaviour {
 
         }
 
-        
 
+        if (CurrentWeapon != null && CurrentWeapon.Durability == 0)
+        {
+            SetWeapon(WeaponType.Snowball);
+        }
 
     }
 
@@ -195,7 +198,10 @@ public class Player : MonoBehaviour {
                 Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
                 foreach(Enemy e in EnemyManager.Instance.Enemies)
                     if (Vector3.Distance(testPos, e.transform.position) < CurrentWeapon.Range)
+                    {
                         e.HitByMelee(this);
+                        CurrentWeapon.Durability--;
+                    }
                 break;
             case WeaponClass.Throw:
                 Projectile p = ProjectileManager.Instance.Spawn(CurrentWeapon.ProjectileType, transform.position + new Vector3((float)faceDir * 0.3f, 1f, 0f), this);
@@ -205,6 +211,8 @@ public class Player : MonoBehaviour {
                     throwVelocity *= CurrentWeapon.Range * 0.5f;
                     throwVelocity.y = CurrentWeapon.Range;
                     p.rigidbody.velocity = throwVelocity;
+
+                    CurrentWeapon.Durability--;
                 }
                 break;
             case WeaponClass.Use:

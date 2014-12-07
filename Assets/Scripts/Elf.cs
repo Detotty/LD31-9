@@ -18,6 +18,9 @@ class Elf : Enemy
 
             CooldownModifier = 2f;
 
+            BaseHealth = 10f;
+            Health = BaseHealth;
+
             Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
             Target.y = 0f;
         }

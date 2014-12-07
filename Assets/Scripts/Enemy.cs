@@ -32,9 +32,12 @@ public class Enemy : MonoBehaviour
 
     // States
     public bool Knockback = false;
+    public bool Dead = false;
 
     // Stats
     public float CooldownModifier;
+    public float BaseHealth;
+    public float Health;
 
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
 
@@ -87,6 +90,21 @@ public class Enemy : MonoBehaviour
 
     internal virtual void Update()
     {
+        if (Dead)
+        {
+            CurrentWeapon = null;
+            transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
+            transform.FindChild("Weapon_Throw").gameObject.SetActive(false);
+
+            IdleAnim();
+
+            Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 1f);
+            //Sprite.Rotate(0f,0f,(90f * faceDir) * Time.deltaTime);
+
+            Sprite.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f,0f,90f * faceDir), Time.deltaTime * 5f);
+
+            return;
+        }
 
 
         if (p1.transform.position.x > transform.position.x)
@@ -212,12 +230,19 @@ public class Enemy : MonoBehaviour
 
         //}
 
+        if (CurrentWeapon!=null && CurrentWeapon.Durability == 0)
+        {
+            SetWeapon(WeaponType.Snowball);
+        }
 
+        if (Health < 0f) Dead = true;
     }
 
     private IEnumerator DoAttack()
     {
         yield return new WaitForSeconds(0.1f);
+
+        if (CurrentWeapon == null) yield break;
 
         switch (CurrentWeapon.Class)
         {
@@ -245,11 +270,13 @@ public class Enemy : MonoBehaviour
 
     public void HitByMelee(Player p)
     {
+        Health -= p.CurrentWeapon.Damage;
         DoKnockback(p.transform.position, p.CurrentWeapon.Knockback);
     }
 
     internal void HitByProjectile(Projectile projectile)
     {
+        Health -= projectile.Damage;
         DoKnockback(projectile.transform.position, projectile.Knockback);
 
     }
@@ -275,9 +302,9 @@ public class Enemy : MonoBehaviour
             headAnim.Play("Head_" + headStyle);
             hairAnim.Play("Hair_" + hairStyle);
 
-            //if (!armsAnim.IsPlaying("Arms_Attack"))
+            if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Walk");
-            //if (!clothesAnim.IsPlaying("Clothes_Attack"))
+            if (!clothesAnim.IsPlaying("Clothes_Attack"))
                 clothesAnim.Play("Clothes_Walk");
 
             if (CurrentWeapon != null && !transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
@@ -290,19 +317,30 @@ public class Enemy : MonoBehaviour
             headAnim.Play("Head_" + headStyle);
             hairAnim.Play("Hair_" + hairStyle);
 
-            //if (!armsAnim.IsPlaying("Arms_Attack"))
+            if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Idle");
-            //if (!clothesAnim.IsPlaying("Clothes_Attack"))
+            if (!clothesAnim.IsPlaying("Clothes_Attack"))
                 clothesAnim.Play("Clothes_Idle");
 
             transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
         }
     }
 
+    internal virtual void IdleAnim()
+    {
+        legsAnim.Play("Legs_Idle");
+        torsoAnim.Play("Torso_Walk");
+        headAnim.Play("Head_" + headStyle);
+        hairAnim.Play("Hair_" + hairStyle);
+
+        armsAnim.Play("Arms_Idle");
+        clothesAnim.Play("Clothes_Idle");
+    }
+
     internal virtual void AttackAnim(string anim)
     {
-        //armsAnim.PlayFromFrame("Arms_Attack", 0);
-        //clothesAnim.PlayFromFrame("Clothes_Attack", 0);
+        armsAnim.PlayFromFrame("Arms_Attack", 0);
+        clothesAnim.PlayFromFrame("Clothes_Attack", 0);
     }
 
     public bool Get(Item item)
