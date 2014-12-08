@@ -13,8 +13,10 @@ public class ProjectileManager : MonoBehaviour {
     public List<Projectile> Projectiles = new List<Projectile>();
 
     public GameObject SnowParticlesPrefab;
+    public GameObject FireParticlesPrefab;
 
-    public Sprite ProjectileSheet;
+    // Projectile Sprites
+    public List<Sprite> Sprites = new List<Sprite>(); 
 
 	// Use this for initialization
 	void Start () {

@@ -75,7 +75,7 @@ public class Player : MonoBehaviour {
         }
 
         playerDurabilitySlider = playerDurabilityObject.transform.FindChild("DurabilitySlider").GetComponent<Slider>();
-        SetWeapon(WeaponType.Flamethrower);
+        SetWeapon(WeaponType.Snowball);
 
         if (playerDurabilitySlider != null)
         {
@@ -219,28 +219,29 @@ public class Player : MonoBehaviour {
 
         if (Input.GetButtonDown("P1 Throw") && CurrentWeapon != null)
         {
+            if (CurrentWeapon.Type == WeaponType.Snowball) return;
+
             switch (CurrentWeapon.Class)
             {
                 case WeaponClass.Melee:
                     //transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
                     break;
             }
-            SetWeapon(WeaponType.Snowball);
 
-            Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
+            Item i = ItemManager.Instance.SpawnWeapon(CurrentWeapon.Type, CurrentWeapon.Durability);
             if (i != null)
             {
-                i.transform.position = transform.position + new Vector3((float)faceDir*1f,1f,0f);
-                Vector3 throwVelocity = new Vector3((float)faceDir*7f,3f,0f);
+                i.transform.position = transform.position + new Vector3((float)faceDir * 1f, 1f, 0f);
+                Vector3 throwVelocity = new Vector3((float)faceDir * 7f, 3f, 0f);
                 i.rigidbody.velocity = throwVelocity;
             }
 
-          
+            SetWeapon(WeaponType.Snowball);
 
         }
 
 
-        if (CurrentWeapon != null && CurrentWeapon.Durability == 0)
+        if (CurrentWeapon != null && CurrentWeapon.Durability <= 0)
         {
             SetWeapon(WeaponType.Snowball);
         }
@@ -258,7 +259,7 @@ public class Player : MonoBehaviour {
             case WeaponClass.Melee:
                 Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
                 foreach(Enemy e in EnemyManager.Instance.Enemies)
-                    if (Vector3.Distance(testPos, e.transform.position) < CurrentWeapon.Range)
+                    if (Vector3.Distance(testPos, e.transform.position + new Vector3(0f,1f,0f)) < CurrentWeapon.Range && !e.Dead)
                     {
                         e.HitByMelee(this);
                         CurrentWeapon.Durability--;
@@ -291,6 +292,8 @@ public class Player : MonoBehaviour {
                 transform.FindChild("Body/Weapon_Use/FlamethrowerParticles").GetComponent<ParticleSystem>().Emit(20);
                 break;
         }
+
+        CurrentWeapon.Durability--;
     }
 
     void ToggleWalk(bool walk)
@@ -442,6 +445,7 @@ public class Player : MonoBehaviour {
                 if((CurrentWeapon!=null && CurrentWeapon.Type!=WeaponType.Snowball)) return false;
 
                 SetWeapon(item.WeaponType);
+                CurrentWeapon.Durability = item.Durability;
                 //CurrentWeapon = new Weapon(item.WeaponType);
 
 

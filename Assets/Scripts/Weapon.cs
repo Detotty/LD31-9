@@ -9,8 +9,12 @@ public enum WeaponType
     Snowball,
     Stick,
     SnowmanMelee,
+    IceQueenMelee,
     Carrot,
-    Flamethrower
+    Flamethrower,
+    Knife,
+    Cane,
+    Molotov
 }
 
 public enum WeaponClass
@@ -51,21 +55,58 @@ public class Weapon
                 ProjectileType = ProjectileType.Snowball;
                 Knockback = 100f;
                 CanBreak = false;
-                Damage = 2f;
+                Damage = 1f;
                 HitSoundClip = "Footsteps_Heavy_Snow";
                 
                 SwingSoundClip = "";
                 break;
+            case WeaponType.Cane:
+                BaseDurability = 30;
+                Class = WeaponClass.Melee;
+                Range = 1.5f;
+                Cooldown = 0.2f;
+                Knockback = 100f;
+                CanBreak = true;
+                Damage = 4f;
+
+                HitSoundClip = "Club";
+                SwingSoundClip = "";
+                break;
             case WeaponType.Stick:
+                BaseDurability = 10;
+                Class = WeaponClass.Melee;
+                Range = 1.7f;
+                Cooldown = 0.2f;
+                Knockback = 150f;
+                CanBreak = true;
+                Damage = 3f;
+               
+                HitSoundClip = "Club";
+                SwingSoundClip = "";
+                break;
+            case WeaponType.Knife:
                 BaseDurability = 20;
                 Class = WeaponClass.Melee;
                 Range = 1.5f;
                 Cooldown = 0.2f;
-                Knockback = 150f;
+                Knockback = 100f;
                 CanBreak = true;
-                Damage = 4f;
-               
+                Damage = 6f;
+
                 HitSoundClip = "Club";
+                SwingSoundClip = "";
+                break;
+            case WeaponType.Molotov:
+                BaseDurability = 20;
+                Class = WeaponClass.Throw;
+                Range = 10f;
+                Cooldown = 0.5f;
+                ProjectileType = ProjectileType.Molotov;
+                Knockback = 100f;
+                CanBreak = true;
+                Damage = 1f;
+                HitSoundClip = "Club";
+
                 SwingSoundClip = "";
                 break;
             case WeaponType.SnowmanMelee:
@@ -80,10 +121,22 @@ public class Weapon
                 SwingSoundClip = "";
                
                 break;
+            case WeaponType.IceQueenMelee:
+                BaseDurability = -1;
+                Class = WeaponClass.Melee;
+                Range = 2f;
+                Cooldown = 0.2f;
+                Knockback = 150f;
+                CanBreak = false;
+                Damage = 7f;
+                HitSoundClip = "Club";
+                SwingSoundClip = "";
+
+                break;
             case WeaponType.Carrot:
                 BaseDurability = -1;
                 Class = WeaponClass.Throw;
-                Range = 10f;
+                Range = 11f;
                 Cooldown = 0.2f;
                 ProjectileType = ProjectileType.Carrot;
                 Knockback = 100f;

@@ -57,15 +57,22 @@ public class Spectator : MonoBehaviour
 	        {
                 WeaponType newWT = WeaponType.Stick;
 
-	            if (ItemManager.Instance.Items.Count(it => it.gameObject.activeSelf && it.WeaponType == newWT) < 3)
+                if (Random.Range(0, 3) == 0) newWT = WeaponType.Cane;
+                if (Random.Range(0, 10) == 0) newWT = WeaponType.Knife;
+                if (Random.Range(0, 15) == 0) newWT = WeaponType.Molotov;
+                if (Random.Range(0, 25) == 0) newWT = WeaponType.Flamethrower;
+
+	            if (ItemManager.Instance.Items.Count(it => it.gameObject.activeSelf && it.WeaponType == newWT) < 1)
 	            {
-	                Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
+                    var tmpW = new Weapon(newWT);
+
+	                Item i = ItemManager.Instance.SpawnWeapon(newWT, tmpW.BaseDurability);
 	                if (i != null)
 	                {
 	                    i.transform.position = transform.position;
-	                    Vector3 throwVelocity = ((arenaCenter.position + (Random.insideUnitSphere*7f)) - transform.position);
+	                    Vector3 throwVelocity = ((arenaCenter.position + (Random.insideUnitSphere*8f)) - transform.position);
 	                    // throwVelocity *= 0.6f;
-	                    throwVelocity.y = 7f;
+	                    throwVelocity.y = 9f;
 	                    i.rigidbody.velocity = throwVelocity;
 	                }
 	            }

@@ -40,12 +40,12 @@ public class ItemManager : MonoBehaviour {
 	
 	}
 
-    public Item SpawnWeapon(WeaponType type)
+    public Item SpawnWeapon(WeaponType type, int durability)
     {
         Item i = Items.FirstOrDefault(it => !it.gameObject.activeSelf);
         if (i == null) return null;
 
-        i.Init(ItemType.Weapon, WeaponType.Stick);
+        i.Init(ItemType.Weapon, type, durability);
         return i;
     }
 

@@ -8,7 +8,8 @@ using System.Collections;
 public enum ProjectileType
 {
     Snowball,
-    Carrot
+    Carrot,
+    Molotov
 }
 
 
@@ -43,6 +44,8 @@ public class Projectile : MonoBehaviour
 	    lifeTime += Time.deltaTime;
 
 	    transform.localScale = new Vector3(faceDir*5f, 5f, 5f);
+
+        if(Type!= ProjectileType.Carrot) transform.Rotate(0,0,20f);
 	}
 
     void OnTriggerEnter(Collider other)
@@ -72,6 +75,15 @@ public class Projectile : MonoBehaviour
                 //    transform.DetachChildren();
                 //}
                 break;
+            case ProjectileType.Molotov:
+                if (transform.FindChild("FireParticles") != null)
+                {
+                    transform.FindChild("FireParticles").GetComponent<ParticleSystem>().Emit(10);
+                    Destroy(transform.FindChild("FireParticles").gameObject,
+                        transform.FindChild("FireParticles").GetComponent<ParticleSystem>().duration);
+                    transform.DetachChildren();
+                }
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -93,6 +105,7 @@ public class Projectile : MonoBehaviour
     {
         Type = type;
         Owner = owner;
+        transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
         if (owner is Enemy)
         {
@@ -118,17 +131,18 @@ public class Projectile : MonoBehaviour
 
         transform.position = pos;
 
-        
-
         GameObject pm;
         switch (Type)
         {
             case ProjectileType.Snowball:
-                GetComponent<SpriteRenderer>().sprite = ProjectileManager.Instance.ProjectileSheet;
-                GetComponent<SpriteRenderer>().sprite.name = type.ToString();
                 pm = (GameObject)Instantiate(ProjectileManager.Instance.SnowParticlesPrefab, transform.position, Quaternion.identity);
                 pm.transform.parent = transform;
                 pm.transform.name = "SnowParticles";
+                break;
+            case ProjectileType.Molotov:
+                pm = (GameObject)Instantiate(ProjectileManager.Instance.FireParticlesPrefab, transform.position, Quaternion.identity);
+                pm.transform.parent = transform;
+                pm.transform.name = "FireParticles";
                 break;
         }
 

@@ -171,8 +171,10 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < 5 + Wave; i++)
         {
             EnemyType newE = EnemyType.Elf;
-            if(Wave>=1)
+            if(Wave>=2)
                 if(Random.Range(0,3)==0) newE = EnemyType.Snowman;
+            if (Wave >= 3)
+                if (Random.Range(0, 5) == 0) newE = EnemyType.IceQueen;
 
             spawnList.Add(newE);
         }

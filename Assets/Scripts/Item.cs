@@ -13,6 +13,7 @@ public class Item : MonoBehaviour
 {
     public ItemType Type;
     public WeaponType WeaponType;
+    public int Durability;
 
     private float lifeTime = 0f;
 
@@ -43,14 +44,18 @@ public class Item : MonoBehaviour
         }
     }
 
-    internal void Init(ItemType type, WeaponType w)
+    internal void Init(ItemType type, WeaponType w, int dur)
     {
         Type = type;
         WeaponType = w;
+        Durability = 0;
 
         switch (Type)
         {
             case ItemType.Weapon:
+
+    
+                Durability = dur;
 
                 //GetComponent<SpriteRenderer>().sprite = ItemManager.Instance.WeaponSheet;
                 foreach (Sprite s in ItemManager.Instance.Sprites)

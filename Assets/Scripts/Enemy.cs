@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using System.Collections;
@@ -9,7 +10,8 @@ using Random = UnityEngine.Random;
 public enum EnemyType
 {
     Elf,
-    Snowman
+    Snowman,
+    IceQueen
 }
 
 public class Enemy : MonoBehaviour
@@ -72,7 +74,7 @@ public class Enemy : MonoBehaviour
     {
         turntarget = actualSize.x;
 
-        legsAnim = transform.FindChild("Body/Legs").GetComponent<tk2dSpriteAnimator>();
+        
         torsoAnim = transform.FindChild("Body/Torso").GetComponent<tk2dSpriteAnimator>();
         armsAnim = transform.FindChild("Body/Arms").GetComponent<tk2dSpriteAnimator>();
         headAnim = transform.FindChild("Body/Head").GetComponent<tk2dSpriteAnimator>();
@@ -208,7 +210,7 @@ public class Enemy : MonoBehaviour
         {
             OnFire -= Time.deltaTime;
             Health -= 0.02f;
-            transform.FindChild("FireParticles").GetComponent<ParticleSystem>().Emit(20);
+            transform.FindChild("FireParticles").GetComponent<ParticleSystem>().Emit(5);
         }
 
         if (Health < 0f) Dead = true;
@@ -259,6 +261,20 @@ public class Enemy : MonoBehaviour
             if (Random.Range(0, 100) == 0)
             {
                 Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
+                Target.y = 0f;
+            }
+            else if (Random.Range(0, 100) == 0 && CanUseWeapons)
+            {
+                List<Item> stuff = ItemManager.Instance.Items.Where(it => it.Type == ItemType.Weapon).ToList();
+                if (stuff.Count > 0)
+                {
+                    Target = stuff[Random.Range(0, stuff.Count)].transform.position;
+                    Target.y = 0f;
+                }
+            }
+            else if (Random.Range(0, 100) == 0)
+            {
+                Vector3 targ = p1.transform.position + (Random.insideUnitSphere*1.5f);
                 Target.y = 0f;
             }
         }
@@ -332,6 +348,8 @@ public class Enemy : MonoBehaviour
     internal void HitByProjectile(Projectile projectile)
     {
         DoKnockback(projectile.transform.position, projectile.Knockback);
+
+        if (projectile.Type == ProjectileType.Molotov) OnFire += 5f;
 
         if (Dead) return;
         Health -= projectile.Damage;
@@ -487,6 +505,7 @@ public class Enemy : MonoBehaviour
 
     public bool Get(Item item)
     {
+        if (Dead) return false;
         if (!CanUseWeapons) return false;
 
         switch (item.Type)
