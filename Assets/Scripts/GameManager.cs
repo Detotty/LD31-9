@@ -21,8 +21,9 @@ public class GameManager : MonoBehaviour {
     public Slider playerTwoHealthSlider;
     private string waveDefaultText = "Wave: {0}";
     public GameObject gameOverObject;
-    public int PlayerOneBodyCount;
-    public int PlayerTwoBodyCount; 
+    public Text TeamBodyCountText;
+    public int TeamBodyCount;
+    
 
   
 
@@ -98,13 +99,23 @@ public class GameManager : MonoBehaviour {
             }
         
 	    }
+
+        if (TeamBodyCountText != null)
+        {
+
+            TeamBodyCountText.text = "BodyCount: " + TeamBodyCount;
+
+
+        }
+
+
 	}
 
     public void Restart()
     {
         Debug.Log("Restart pressed");
        
-        //Application.LoadLevel(Application.loadedLevel);
+        Application.LoadLevel(Application.loadedLevel);
 
         
 

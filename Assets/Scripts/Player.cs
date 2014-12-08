@@ -198,15 +198,25 @@ public class Player : MonoBehaviour {
                 case WeaponClass.Melee:
                     transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
                     AttackAnim("Attack");
+                   playSwingingAudio();
                     break;
                 case WeaponClass.Throw:
                     transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
                     AttackAnim("Attack");
+                    playSwingingAudio();
                     break;
             }
 
             attackCooldown = CurrentWeapon.Cooldown;
             StartCoroutine("DoAttack");
+        }
+
+        if (Input.GetButtonUp("P1 Weapon") && CurrentWeapon.Type== WeaponType.Flamethrower)
+        {
+            if (Sounds[CurrentWeapon.SwingSoundClip].isPlaying)
+            {
+                Sounds[CurrentWeapon.SwingSoundClip].Stop();
+            }
         }
 
         transform.FindChild("Body/Weapon_Use/FlamethrowerLight").gameObject.SetActive(false);
@@ -256,7 +266,9 @@ public class Player : MonoBehaviour {
         switch (CurrentWeapon.Class)
         {
             case WeaponClass.Melee:
-                Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
+
+                playSwingingAudio();
+                    Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
                 foreach(Enemy e in EnemyManager.Instance.Enemies)
                     if (Vector3.Distance(testPos, e.transform.position) < CurrentWeapon.Range)
                     {
@@ -265,6 +277,7 @@ public class Player : MonoBehaviour {
                     }
                 break;
             case WeaponClass.Throw:
+                playSwingingAudio();
                 Projectile p = ProjectileManager.Instance.Spawn(CurrentWeapon.ProjectileType, transform.position + new Vector3((float)faceDir * 0.3f, 1f, 0f), this);
                 if (p != null)
                 {
@@ -283,12 +296,26 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private void playSwingingAudio()
+    {
+
+        
+        if (!"".Equals(CurrentWeapon.SwingSoundClip))
+        {
+            if (!Sounds[CurrentWeapon.SwingSoundClip].isPlaying)
+            {
+                Sounds[CurrentWeapon.SwingSoundClip].Play();
+            }
+        }
+    }
+
     void UseWeapon()
     {
         switch (CurrentWeapon.Type)
         {
             case WeaponType.Flamethrower:
                 transform.FindChild("Body/Weapon_Use/FlamethrowerParticles").GetComponent<ParticleSystem>().Emit(20);
+                playSwingingAudio();
                 break;
         }
     }
@@ -483,20 +510,7 @@ public class Player : MonoBehaviour {
             Debug.Log("playerDurabilitySlider is null");
         }
 
-        if (BodyCountTextObject != null)
-        {
-            if (PlayerNumber == 1)
-            {
-                BodyCountTextObject.text = "Player 1 : BodyCount " + GameManager.Instance.PlayerOneBodyCount;
-            }else if (PlayerNumber==2){
-                BodyCountTextObject.text = "Player 2 : BodyCount " + GameManager.Instance.PlayerTwoBodyCount;
-            }
-            else
-            {
-                Debug.Log("Unknown Player");
-            }
-           
-        }
+       
     }
 
 
