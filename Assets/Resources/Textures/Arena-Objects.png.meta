@@ -9,6 +9,17 @@ TextureImporter:
     21300008: Flag
     21300010: WallSpike
     21300012: Torch
+    21300014: BackBoard
+    21300016: Zero
+    21300018: One
+    21300020: Two
+    21300022: Three
+    21300024: Four
+    21300026: Five
+    21300028: Six
+    21300030: Seven
+    21300032: Eight
+    21300034: Nine
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -119,6 +130,116 @@ TextureImporter:
         height: 16
       alignment: 0
       pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: BackBoard
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 224
+        width: 48
+        height: 16
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Zero
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: One
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 210
+        width: 7
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Two
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Three
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Four
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Five
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Six
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Seven
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Eight
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 210
+        width: 9
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Nine
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 210
+        width: 7
+        height: 12
+      alignment: 7
+      pivot: {x: .5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
