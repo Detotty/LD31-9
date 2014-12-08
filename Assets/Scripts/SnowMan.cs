@@ -132,4 +132,35 @@ public class Snowman : Enemy {
         headAnim.PlayFromFrame("Head_" + anim, 0);
         torsoAnim.PlayFromFrame("Torso_" + anim, 0);
     }
+
+
+    /**
+     * Override these with creature specific sounds 
+     * 
+     */
+   internal override void playPain()
+    {
+        Sounds["Snow_man_roar"].Play();
+
+    }
+
+    internal override void playThrowingWeapon()
+    {
+        Sounds["Footsteps_Heavy_Snow"].Play();
+    }
+
+     internal override void playMeleeWeapon()
+    {
+        Sounds["Club"].Play();
+    }
+
+     internal  override void startWalkingAudio()
+    {
+        playWalkAudio(Sounds["Footsteps_Heavy_Snow"]);
+    }
+
+     internal override void stopWalkingAudio()
+    {
+        stopWalkAudio(Sounds["Footsteps_Heavy_Snow"]);
+    }
 }

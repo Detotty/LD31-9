@@ -256,6 +256,7 @@ public class Enemy : MonoBehaviour
         {
             case WeaponClass.Melee:
                 Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
+                playMeleeWeapon();
                     if (Vector3.Distance(testPos, p1.transform.position) < CurrentWeapon.Range)
                         p1.HitByMelee(this);
                 break;
@@ -268,6 +269,7 @@ public class Enemy : MonoBehaviour
                     throwVelocity.y = CurrentWeapon.Range;
                     p.rigidbody.velocity = throwVelocity;
                 }
+                playThrowingWeapon();
                 break;
             case WeaponClass.Use:
                 break;
@@ -280,13 +282,14 @@ public class Enemy : MonoBehaviour
     {
         Health -= p.CurrentWeapon.Damage;
         DoKnockback(p.transform.position, p.CurrentWeapon.Knockback);
+        playPain();
     }
 
     internal void HitByProjectile(Projectile projectile)
     {
         Health -= projectile.Damage;
         DoKnockback(projectile.transform.position, projectile.Knockback);
-
+        playPain();
     }
 
     void DoKnockback(Vector3 pos, float force)
@@ -311,12 +314,21 @@ public class Enemy : MonoBehaviour
             hairAnim.Play("Hair_" + hairStyle);
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
+            {
                 armsAnim.Play("Arms_Walk");
+                startWalkingAudio();
+            }
             if (!clothesAnim.IsPlaying("Clothes_Attack"))
+            {
                 clothesAnim.Play("Clothes_Walk");
+                startWalkingAudio();
+            }
 
             if (CurrentWeapon != null && !transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+            {
                 transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
+                startWalkingAudio();
+            }
         }
         else
         {
@@ -331,6 +343,58 @@ public class Enemy : MonoBehaviour
                 clothesAnim.Play("Clothes_Idle");
 
             transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
+            stopWalkingAudio();
+        }
+    }
+
+
+    /**
+     * Override these with creature specific sounds 
+     * 
+     */
+    internal virtual void playPain(){
+        Sounds["Grunt_Male_pain"].Play();
+    
+    }
+
+    internal virtual void playThrowingWeapon()
+    {
+        Sounds["Footsteps_Heavy_Snow"].Play();
+    }
+
+    internal virtual void playMeleeWeapon()
+    {
+        Sounds["Club"].Play();
+    }
+
+    internal virtual void startWalkingAudio()
+    {
+        playWalkAudio(Sounds["Footsteps_Light_Snow"]);
+    }
+
+    internal virtual void stopWalkingAudio()
+    {
+        stopWalkAudio(Sounds["Footsteps_Light_Snow"]);
+    }
+
+
+    internal virtual void playWalkAudio(AudioSource source)
+    {
+
+        if (!source.isPlaying)
+        {
+            source.loop = true;
+            source.Play();
+
+        }
+    }
+
+    internal virtual void stopWalkAudio(AudioSource source)
+    {
+        if (rigidbody.velocity.sqrMagnitude < 0.01f)
+        {
+            //Debug.Log("Stopping Player Audio" + source.clip.name);
+            source.loop = false;
         }
     }
 
