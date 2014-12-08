@@ -26,6 +26,7 @@ public class Weapon
     public float Knockback;
     public float Damage;
     public int Durability;
+    public int BaseDurability;
 
     public float Range;
 
@@ -45,11 +46,12 @@ public class Weapon
                 Damage = 3f;
                 break;
             case WeaponType.Stick:
+                BaseDurability = 20;
                 Class = WeaponClass.Melee;
                 Range = 1.5f;
                 Cooldown = 0.2f;
                 Knockback = 150f;
-                Durability = 20;
+                Durability = BaseDurability;
                 Damage = 3f;
                 break;
         }

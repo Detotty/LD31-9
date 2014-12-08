@@ -11,6 +11,8 @@ public class Player : MonoBehaviour {
     public Transform HUD;
     public Transform Sprite;
     public Sprite WeaponSheet;
+    public Slider playerHealthSlider;
+    public Slider playerDurabilitySlider;
         
 
 	// "Physics"
@@ -27,7 +29,8 @@ public class Player : MonoBehaviour {
     public bool Knockback = false;
 
     // Stats
-    public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();  
+    public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
+    public float playerHealth = 1000;
 
     private float turntarget = 12f;
     private int faceDir = 1;
@@ -61,6 +64,7 @@ public class Player : MonoBehaviour {
         }
 
         SetWeapon(WeaponType.Snowball);
+        playerDurabilitySlider.maxValue=CurrentWeapon.BaseDurability;
     }
 
     private void SetWeapon(WeaponType type)
@@ -70,12 +74,13 @@ public class Player : MonoBehaviour {
         transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
         transform.FindChild("Weapon_Throw").gameObject.SetActive(false);
         //transform.FindChild("Weapon_Use").gameObject.SetActive(false);
-
+            
         switch (CurrentWeapon.Class)
         {
             case WeaponClass.Melee:
                 transform.FindChild("Weapon_Swipe").gameObject.SetActive(true);
                 transform.FindChild("Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+
                 break;
             case WeaponClass.Throw:
                 transform.FindChild("Weapon_Throw").gameObject.SetActive(true);
@@ -86,7 +91,10 @@ public class Player : MonoBehaviour {
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        
+        if (CurrentWeapon.BaseDurability > 0) { 
+        playerDurabilitySlider.maxValue = CurrentWeapon.BaseDurability;
+        playerDurabilitySlider.value = CurrentWeapon.BaseDurability;
+    }
     }
 
     void Update()
@@ -311,8 +319,10 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
-
+                
         Sounds["Grunt_Male_pain"].Play();
+        playerHealth -= e.CurrentWeapon.Damage;
+        
     }
 
     internal void HitByProjectile(Projectile projectile)
@@ -328,6 +338,7 @@ public class Player : MonoBehaviour {
         Knockback = true;
 
         Sounds["Grunt_Male_pain"].Play();
+        playerHealth -= projectile.Damage;
 
     }
 
@@ -355,7 +366,29 @@ public class Player : MonoBehaviour {
         return true;
     }
 
+    void FixedUpdate()
+    {
+        if (playerHealthSlider != null)
+        {
+            Debug.Log("Player Health: "+playerHealth);
+            playerHealthSlider.value = playerHealth;
+        }
+        else
+        {
+            Debug.Log("playerHealthSlider is null");
+        }
 
+        if (playerDurabilitySlider != null)
+        {
+            Debug.Log("Player Durability: " + CurrentWeapon.Durability);
+            playerDurabilitySlider.value = CurrentWeapon.Durability;
+        }
+        else
+        {
+            Debug.Log("playerDurabilitySlider is null");
+        }
+
+    }
 
 
 

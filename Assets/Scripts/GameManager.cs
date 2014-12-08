@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using UnityEngine.UI;
 using UnityEngine;
 using System.Collections;
 using System.Linq;
@@ -14,6 +15,12 @@ public class GameManager : MonoBehaviour {
     public float WaveStartDelay = 5f;
     public bool WaveInProgress = false;
     public float SpawnDelay = 0.5f;
+    public Text WaveText;
+    public Text WaveStartCounterText;
+    public Slider playerOneHealthSlider;
+    public Slider playerTwoHealthSlider;
+    private string waveDefaultText = "Wave: {0}";
+
   
 
     List<EnemyType> spawnList = new List<EnemyType>();
@@ -33,6 +40,9 @@ public class GameManager : MonoBehaviour {
         }
 
         CreateSpawnList();
+
+        playerOneHealthSlider.maxValue = 1000;
+        playerOneHealthSlider.value = 1000;
 	}
 	
 	// Update is called once per frame
@@ -46,7 +56,7 @@ public class GameManager : MonoBehaviour {
 	            startTimer = 0f;
 	            WaveInProgress = true;
 	        }
-
+           
 	        return;
 	    }
 	   
@@ -59,7 +69,9 @@ public class GameManager : MonoBehaviour {
 	            spawnTimer = 0f;
 	            EnemyManager.Instance.Spawn(spawnList[spawnList.Count-1]);
                 spawnList.RemoveAt(spawnList.Count - 1);
+                
 	        }
+            waveDefaultText = "Wave: {0}";
 	    }
 	    else
 	    {
@@ -69,9 +81,51 @@ public class GameManager : MonoBehaviour {
                 WaveInProgress = false;
                 Wave++;
                 startTimer = 0f;
+                if (playerOneHealthSlider != null)
+                {
+                    playerOneHealthSlider.maxValue = 1000;
+                    playerOneHealthSlider.value = 1000;
+
+                }
+
+                if (Wave > 0)
+                {
+                    waveDefaultText = "You have have won Round {0} !!";
+                }
+                
+                
             }
 	    }
 	}
+
+    void FixedUpdate()
+    {
+
+        WaveStartCounterText.text = getStartingCount();
+
+       /** if (Wave-1 == 0)
+        {
+         WaveText.text = string.Format(waveDefaultText,Wave) ;
+        }
+        else
+        {
+            WaveText.text = string.Format(waveDefaultText, Wave-1);
+        }
+        */
+        WaveText.text = string.Format(waveDefaultText, Wave);
+       
+    }
+
+    string getStartingCount()
+    {
+        if (!WaveInProgress)
+        {
+         return " Next Wave in: "+Mathf.Floor(WaveStartDelay - startTimer).ToString();
+        }
+        else return "";
+
+        
+    }
 
     void CreateSpawnList()
     {
