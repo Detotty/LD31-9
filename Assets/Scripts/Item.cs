@@ -51,10 +51,15 @@ public class Item : MonoBehaviour
         switch (Type)
         {
             case ItemType.Weapon:
-                GetComponent<SpriteRenderer>().sprite = ItemManager.Instance.WeaponSheet;
-                GetComponent<SpriteRenderer>().sprite.name = w.ToString();
+
+                //GetComponent<SpriteRenderer>().sprite = ItemManager.Instance.WeaponSheet;
+                foreach (Sprite s in ItemManager.Instance.Sprites)
+                    if (s.name == w.ToString())
+                        GetComponent<SpriteRenderer>().sprite = s;
                 break;
         }
+
+        
 
         lifeTime = 0f;
         gameObject.SetActive(true);
