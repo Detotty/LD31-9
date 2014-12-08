@@ -27,6 +27,9 @@ public class Weapon
     public float Damage;
     public int Durability;
     public int BaseDurability;
+    public string HitSoundClip;
+    public string SwingSoundClip;
+
 
     public float Range;
 
@@ -44,6 +47,8 @@ public class Weapon
                 Knockback = 100f;
                 Durability = -1;
                 Damage = 2f;
+                HitSoundClip = "Footsteps_Heavy_Snow";
+                SwingSoundClip = "";
                 break;
             case WeaponType.Stick:
                 BaseDurability = 20;
@@ -54,6 +59,8 @@ public class Weapon
                 Durability = 20;
                 Damage = 4f;
                 Durability = BaseDurability;
+                HitSoundClip = "Club";
+                SwingSoundClip = "";
                 break;
         }
     }

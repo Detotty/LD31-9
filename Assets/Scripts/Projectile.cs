@@ -16,6 +16,8 @@ public class Projectile : MonoBehaviour
     public object Owner;
     public float Knockback;
     public float Damage;
+    public string HitSoundClip;
+    public string FiringSoundClip;
 
     private ParticleSystem snowParticles;
 
@@ -77,12 +79,16 @@ public class Projectile : MonoBehaviour
         {
             Knockback = ((Enemy)owner).CurrentWeapon.Knockback;
             Damage = ((Enemy)owner).CurrentWeapon.Damage;
+            HitSoundClip = ((Enemy)owner).CurrentWeapon.HitSoundClip;
+            FiringSoundClip = ((Enemy)owner).CurrentWeapon.SwingSoundClip;
         }
 
         if (owner is Player)
         {
             Knockback = ((Player) owner).CurrentWeapon.Knockback;
             Damage = ((Player)owner).CurrentWeapon.Damage;
+            HitSoundClip = ((Player)owner).CurrentWeapon.HitSoundClip;
+            FiringSoundClip = ((Player)owner).CurrentWeapon.SwingSoundClip;
         }
 
         transform.position = pos;

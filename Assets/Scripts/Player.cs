@@ -332,7 +332,10 @@ public class Player : MonoBehaviour {
     {
         armsAnim.PlayFromFrame("Arms_Attack",0);
         clothesAnim.PlayFromFrame("Clothes_Red_Attack",0);
-        Sounds["Club"].Play();
+        if (!"".Equals(CurrentWeapon.SwingSoundClip)){
+            Sounds[CurrentWeapon.SwingSoundClip].Play();
+        }
+
     }
 
     public void HitByMelee(Enemy e)
@@ -345,8 +348,9 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
-                
-        Sounds["Grunt_Male_pain"].Play();
+        Sounds[e.CurrentWeapon.HitSoundClip].Play();
+               
+        StartCoroutine("PlayDamagedSound", Sounds[e.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
 
 
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
@@ -366,14 +370,22 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
-
-        Sounds["Grunt_Male_pain"].Play();
+        Sounds[projectile.HitSoundClip].Play();
+        StartCoroutine("PlayDamagedSound",Sounds[projectile.HitSoundClip].clip.length+0.05f);
+       
 
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
 
         playerHealth -= projectile.Damage;
 
 
+    }
+
+    IEnumerator PlayDamagedSound(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        Sounds["Grunt_Male_pain"].Play();
     }
 
     public bool Get(Item item)

@@ -282,7 +282,8 @@ public class Enemy : MonoBehaviour
     {
         Health -= p.CurrentWeapon.Damage;
         DoKnockback(p.transform.position, p.CurrentWeapon.Knockback);
-        playPain();
+        Sounds[p.CurrentWeapon.HitSoundClip].Play();
+        StartCoroutine("PlayDamagedSound", Sounds[p.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
 
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
     }
@@ -291,7 +292,9 @@ public class Enemy : MonoBehaviour
     {
         Health -= projectile.Damage;
         DoKnockback(projectile.transform.position, projectile.Knockback);
-        playPain();
+       
+        Sounds[projectile.HitSoundClip].Play();
+        StartCoroutine("PlayDamagedSound", Sounds[projectile.HitSoundClip].clip.length + 0.05f);
 
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
     }
@@ -352,6 +355,14 @@ public class Enemy : MonoBehaviour
     }
 
 
+    IEnumerator PlayDamagedSound(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        playPain();
+    }
+
+
     /**
      * Override these with creature specific sounds 
      * 
@@ -360,6 +371,8 @@ public class Enemy : MonoBehaviour
         Sounds["Grunt_Male_pain"].Play();
     
     }
+
+
 
     internal virtual void playThrowingWeapon()
     {
