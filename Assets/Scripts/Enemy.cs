@@ -417,6 +417,8 @@ public class Enemy : MonoBehaviour
 
     public bool Get(Item item)
     {
+        if (!CanUseWeapons) return false;
+
         switch (item.Type)
         {
             case ItemType.Weapon:

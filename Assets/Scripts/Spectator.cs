@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class Spectator : MonoBehaviour
 {
@@ -54,14 +55,19 @@ public class Spectator : MonoBehaviour
 	        currentThrowTime = 0f;
 	        if (Random.Range(0, 100) == 0)
 	        {
-	            Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
-	            if (i != null)
+                WeaponType newWT = WeaponType.Stick;
+
+	            if (ItemManager.Instance.Items.Count(it => it.gameObject.activeSelf && it.WeaponType == newWT) < 3)
 	            {
-	                i.transform.position = transform.position;
-	                Vector3 throwVelocity = ((arenaCenter.position + (Random.insideUnitSphere*7f)) - transform.position);
-	               // throwVelocity *= 0.6f;
-	                throwVelocity.y = 7f;
-                    i.rigidbody.velocity = throwVelocity;
+	                Item i = ItemManager.Instance.SpawnWeapon(WeaponType.Stick);
+	                if (i != null)
+	                {
+	                    i.transform.position = transform.position;
+	                    Vector3 throwVelocity = ((arenaCenter.position + (Random.insideUnitSphere*7f)) - transform.position);
+	                    // throwVelocity *= 0.6f;
+	                    throwVelocity.y = 7f;
+	                    i.rigidbody.velocity = throwVelocity;
+	                }
 	            }
 	        }
 	    }
