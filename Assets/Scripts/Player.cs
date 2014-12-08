@@ -232,6 +232,8 @@ public class Player : MonoBehaviour {
             SetWeapon(WeaponType.Snowball);
         }
 
+        UpdateHealthBar();
+
     }
 
     private IEnumerator DoAttack()
@@ -370,6 +372,7 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
+        Debug.Log(e.Type+ " Playing " + CurrentWeapon.Type);
         Sounds[e.CurrentWeapon.HitSoundClip].Play();
                
         StartCoroutine("PlayDamagedSound", Sounds[e.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
@@ -392,6 +395,7 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
+        Debug.Log("Playing " + projectile.Type);
         Sounds[projectile.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound",Sounds[projectile.HitSoundClip].clip.length+0.05f);
        
@@ -434,12 +438,15 @@ public class Player : MonoBehaviour {
         return true;
     }
 
-    void FixedUpdate()
+   
+
+    private void UpdateHealthBar()
     {
         if (playerHealthSlider != null)
         {
-            Debug.Log("Player Health: "+playerHealth);
+            Debug.Log("Player Health: " + playerHealth);
             playerHealthSlider.value = playerHealth;
+            Debug.Log("Bar value" + playerHealthSlider.value);
         }
         else
         {
@@ -455,7 +462,6 @@ public class Player : MonoBehaviour {
         {
             Debug.Log("playerDurabilitySlider is null");
         }
-
     }
 
 

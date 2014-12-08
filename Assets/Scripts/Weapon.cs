@@ -53,6 +53,7 @@ public class Weapon
                 CanBreak = false;
                 Damage = 2f;
                 HitSoundClip = "Footsteps_Heavy_Snow";
+                
                 SwingSoundClip = "";
                 break;
             case WeaponType.Stick:
@@ -63,7 +64,7 @@ public class Weapon
                 Knockback = 150f;
                 CanBreak = true;
                 Damage = 4f;
-                Durability = BaseDurability;
+               
                 HitSoundClip = "Club";
                 SwingSoundClip = "";
                 break;
@@ -75,7 +76,9 @@ public class Weapon
                 Knockback = 150f;
                 CanBreak = false;
                 Damage = 5f;
-                Durability = BaseDurability;
+                 HitSoundClip = "Club";
+                SwingSoundClip = "";
+               
                 break;
             case WeaponType.Carrot:
                 BaseDurability = -1;
@@ -86,6 +89,9 @@ public class Weapon
                 Knockback = 100f;
                 CanBreak = false;
                 Damage = 5f;
+                
+                HitSoundClip = "Club";
+                SwingSoundClip = "";
                 break;
             case WeaponType.Flamethrower:
                 BaseDurability = 100;
@@ -96,6 +102,9 @@ public class Weapon
                 Knockback = 0f;
                 CanBreak = true;
                 Damage = 0.1f;
+               
+                HitSoundClip = "Club";
+                SwingSoundClip = "";
                 break;
         }
 
