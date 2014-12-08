@@ -12,6 +12,8 @@ public class ProjectileManager : MonoBehaviour {
     public GameObject ProjectilePrefab;
     public List<Projectile> Projectiles = new List<Projectile>();
 
+    public GameObject SnowParticlesPrefab;
+
     public Sprite ProjectileSheet;
 
 	// Use this for initialization

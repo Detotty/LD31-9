@@ -14,8 +14,8 @@ class Elf : Enemy
             hairStyle = Random.Range(0, 3) + 1;
             headStyle = Random.Range(0, 3) + 1;
 
-            hairAnim = transform.FindChild("Hair").GetComponent<tk2dSpriteAnimator>();
-            clothesAnim = transform.FindChild("Clothes").GetComponent<tk2dSpriteAnimator>();
+            hairAnim = transform.FindChild("Body/Hair").GetComponent<tk2dSpriteAnimator>();
+            clothesAnim = transform.FindChild("Body/Clothes").GetComponent<tk2dSpriteAnimator>();
 
             CooldownModifier = 2f;
 

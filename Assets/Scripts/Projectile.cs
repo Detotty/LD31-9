@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using UnityEngine;
 using System.Collections;
 
@@ -16,11 +17,14 @@ public class Projectile : MonoBehaviour
     public float Knockback;
     public float Damage;
 
+    private ParticleSystem snowParticles;
+
     private float lifeTime = 0f;
 
 	// Use this for initialization
-	void Start () {
-	
+	void Start ()
+	{
+	    //snowParticles = GameObject.Find("SnowParticles").GetComponent<ParticleSystem>();
 	}
 	
 	// Update is called once per frame
@@ -33,6 +37,23 @@ public class Projectile : MonoBehaviour
     {
         if (lifeTime < 0.05f) return;
         if (other.GetComponent<Item>() != null) return;
+
+        switch (Type)
+        {
+            case ProjectileType.Snowball:
+                if (transform.FindChild("SnowParticles") != null)
+                {
+                    transform.FindChild("SnowParticles").GetComponent<ParticleSystem>().Emit(10);
+                    Destroy(transform.FindChild("SnowParticles").gameObject,
+                        transform.FindChild("SnowParticles").GetComponent<ParticleSystem>().duration);
+                    transform.DetachChildren();
+                }
+
+                //snowParticles.Emit(transform.position,Vector3.zero,1f,10f,Color.white);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
 
         gameObject.SetActive(false);
 
@@ -71,6 +92,9 @@ public class Projectile : MonoBehaviour
             case ProjectileType.Snowball:
                 GetComponent<SpriteRenderer>().sprite = ProjectileManager.Instance.ProjectileSheet;
                 GetComponent<SpriteRenderer>().sprite.name = type.ToString();
+                var pm = (GameObject)Instantiate(ProjectileManager.Instance.SnowParticlesPrefab, transform.position, Quaternion.identity);
+                pm.transform.parent = transform;
+                pm.transform.name = "SnowParticles";
                 break;
         }
 

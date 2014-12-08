@@ -47,12 +47,12 @@ public class Player : MonoBehaviour {
     {
         turntarget = actualSize.x;
 
-        legsAnim = transform.FindChild("Legs").GetComponent<tk2dSpriteAnimator>();
-        torsoAnim = transform.FindChild("Torso").GetComponent<tk2dSpriteAnimator>();
-        armsAnim = transform.FindChild("Arms").GetComponent<tk2dSpriteAnimator>();
-        headAnim = transform.FindChild("Head").GetComponent<tk2dSpriteAnimator>();
-        hairAnim = transform.FindChild("Hair").GetComponent<tk2dSpriteAnimator>();
-        clothesAnim = transform.FindChild("Clothes").GetComponent<tk2dSpriteAnimator>();
+        legsAnim = transform.FindChild("Body/Legs").GetComponent<tk2dSpriteAnimator>();
+        torsoAnim = transform.FindChild("Body/Torso").GetComponent<tk2dSpriteAnimator>();
+        armsAnim = transform.FindChild("Body/Arms").GetComponent<tk2dSpriteAnimator>();
+        headAnim = transform.FindChild("Body/Head").GetComponent<tk2dSpriteAnimator>();
+        hairAnim = transform.FindChild("Body/Hair").GetComponent<tk2dSpriteAnimator>();
+        clothesAnim = transform.FindChild("Body/Clothes").GetComponent<tk2dSpriteAnimator>();
 
         GameObject soundsObject = transform.FindChild("Audio").gameObject;
         foreach (AudioSource a in soundsObject.GetComponents<AudioSource>())
@@ -67,19 +67,19 @@ public class Player : MonoBehaviour {
     {
         CurrentWeapon = new Weapon(type);
 
-        transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
-        transform.FindChild("Weapon_Throw").gameObject.SetActive(false);
+        transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
+        transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
         //transform.FindChild("Weapon_Use").gameObject.SetActive(false);
 
         switch (CurrentWeapon.Class)
         {
             case WeaponClass.Melee:
-                transform.FindChild("Weapon_Swipe").gameObject.SetActive(true);
-                transform.FindChild("Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(true);
+                transform.FindChild("Body/Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
                 break;
             case WeaponClass.Throw:
-                transform.FindChild("Weapon_Throw").gameObject.SetActive(true);
-                transform.FindChild("Weapon_Throw").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(true);
+                transform.FindChild("Body/Weapon_Throw").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
                 break;
             case WeaponClass.Use:
                 break;
@@ -146,11 +146,11 @@ public class Player : MonoBehaviour {
             switch (CurrentWeapon.Class)
             {
                 case WeaponClass.Melee:
-                    transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                    transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
                     AttackAnim("Attack");
                     break;
                 case WeaponClass.Throw:
-                    transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
+                    transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
                     AttackAnim("Attack");
                     break;
             }
@@ -240,16 +240,16 @@ public class Player : MonoBehaviour {
                 switch (CurrentWeapon.Class)
                 {
                     case WeaponClass.Melee:
-                        if (!transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+                        if (!transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().isPlaying)
                         {
-                            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
+                            transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
                             startWalkingAudio(Sounds["Footsteps_Light_Snow"]);
                         }
                         break;
                     case WeaponClass.Throw:
-                        if (!transform.FindChild("Weapon_Throw").GetComponent<Animation>().isPlaying)
+                        if (!transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().isPlaying)
                         {
-                            transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Walk");
+                            transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Play("Weapon_Walk");
                             startWalkingAudio(Sounds["Footsteps_Light_Snow"]);
                         }
                         break;
@@ -268,8 +268,8 @@ public class Player : MonoBehaviour {
             if (!clothesAnim.IsPlaying("Clothes_Red_Attack"))
                 clothesAnim.Play("Clothes_Red_Idle");
 
-            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
-            transform.FindChild("Weapon_Throw").GetComponent<Animation>().Stop("Weapon_Walk");
+            transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
+            transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Stop("Weapon_Walk");
             stopWalkingAudio(Sounds["Footsteps_Light_Snow"]);
         }
     }
@@ -313,6 +313,8 @@ public class Player : MonoBehaviour {
         Knockback = true;
 
         Sounds["Grunt_Male_pain"].Play();
+
+        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
     }
 
     internal void HitByProjectile(Projectile projectile)
@@ -328,7 +330,7 @@ public class Player : MonoBehaviour {
         Knockback = true;
 
         Sounds["Grunt_Male_pain"].Play();
-
+        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
     }
 
     public bool Get(Item item)

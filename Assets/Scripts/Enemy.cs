@@ -69,10 +69,10 @@ public class Enemy : MonoBehaviour
     {
         turntarget = actualSize.x;
 
-        legsAnim = transform.FindChild("Legs").GetComponent<tk2dSpriteAnimator>();
-        torsoAnim = transform.FindChild("Torso").GetComponent<tk2dSpriteAnimator>();
-        armsAnim = transform.FindChild("Arms").GetComponent<tk2dSpriteAnimator>();
-        headAnim = transform.FindChild("Head").GetComponent<tk2dSpriteAnimator>();
+        legsAnim = transform.FindChild("Body/Legs").GetComponent<tk2dSpriteAnimator>();
+        torsoAnim = transform.FindChild("Body/Torso").GetComponent<tk2dSpriteAnimator>();
+        armsAnim = transform.FindChild("Body/Arms").GetComponent<tk2dSpriteAnimator>();
+        headAnim = transform.FindChild("Body/Head").GetComponent<tk2dSpriteAnimator>();
         
         
 
@@ -96,15 +96,15 @@ public class Enemy : MonoBehaviour
         if (Dead)
         {
             CurrentWeapon = null;
-            transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
-            transform.FindChild("Weapon_Throw").gameObject.SetActive(false);
+            transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
+            transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
 
             IdleAnim();
 
             Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 1f);
             //Sprite.Rotate(0f,0f,(90f * faceDir) * Time.deltaTime);
 
-            Sprite.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f,0f,90f * faceDir), Time.deltaTime * 5f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f,0f,90f * faceDir), Time.deltaTime * 5f);
 
             return;
         }
@@ -165,7 +165,7 @@ public class Enemy : MonoBehaviour
         //    switch (CurrentWeapon.Class)
         //    {
         //        case WeaponClass.Swipe:
-        //            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+        //            transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
         //            break;
         //    }
         //}
@@ -174,7 +174,7 @@ public class Enemy : MonoBehaviour
         //    switch (CurrentWeapon.Class)
         //    {
         //        case WeaponClass.Swipe:
-        //            transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
+        //            transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
         //            break;
         //    }
         //    CurrentWeapon = null;
@@ -211,7 +211,7 @@ public class Enemy : MonoBehaviour
                     {
                         case WeaponClass.Melee:
 
-                            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                            transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
                             AttackAnim("Attack");
                             attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
                             StartCoroutine("DoAttack");
@@ -221,7 +221,7 @@ public class Enemy : MonoBehaviour
                             Vector3 forward = new Vector3(faceDir, 0f, 0f).normalized;
                             if (Vector3.Angle(p1.transform.position - transform.position, forward) < 10f)
                             {
-                                transform.FindChild("Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
+                                transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
                                 AttackAnim("Attack");
                                 attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
                                 StartCoroutine("DoAttack");
@@ -283,6 +283,8 @@ public class Enemy : MonoBehaviour
         Health -= p.CurrentWeapon.Damage;
         DoKnockback(p.transform.position, p.CurrentWeapon.Knockback);
         playPain();
+
+        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
     }
 
     internal void HitByProjectile(Projectile projectile)
@@ -290,6 +292,8 @@ public class Enemy : MonoBehaviour
         Health -= projectile.Damage;
         DoKnockback(projectile.transform.position, projectile.Knockback);
         playPain();
+
+        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
     }
 
     void DoKnockback(Vector3 pos, float force)
@@ -324,9 +328,9 @@ public class Enemy : MonoBehaviour
                 startWalkingAudio();
             }
 
-            if (CurrentWeapon != null && !transform.FindChild("Weapon_Swipe").GetComponent<Animation>().isPlaying)
+            if (CurrentWeapon != null && !transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().isPlaying)
             {
-                transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
+                transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Walk");
                 startWalkingAudio();
             }
         }
@@ -342,7 +346,7 @@ public class Enemy : MonoBehaviour
             if (!clothesAnim.IsPlaying("Clothes_Attack"))
                 clothesAnim.Play("Clothes_Idle");
 
-            transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
+            transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
             stopWalkingAudio();
         }
     }
@@ -442,19 +446,19 @@ public class Enemy : MonoBehaviour
     {
         CurrentWeapon = new Weapon(type);
 
-        transform.FindChild("Weapon_Swipe").gameObject.SetActive(false);
-        transform.FindChild("Weapon_Throw").gameObject.SetActive(false);
+        transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
+        transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
         //transform.FindChild("Weapon_Use").gameObject.SetActive(false);
 
         switch (CurrentWeapon.Class)
         {
             case WeaponClass.Melee:
-                transform.FindChild("Weapon_Swipe").gameObject.SetActive(true);
-                transform.FindChild("Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(true);
+                transform.FindChild("Body/Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
                 break;
             case WeaponClass.Throw:
-                transform.FindChild("Weapon_Throw").gameObject.SetActive(true);
-                transform.FindChild("Weapon_Throw").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(true);
+                transform.FindChild("Body/Weapon_Throw").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
                 break;
             case WeaponClass.Use:
                 break;
