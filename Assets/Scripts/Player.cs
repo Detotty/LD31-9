@@ -243,6 +243,8 @@ public class Player : MonoBehaviour {
             SetWeapon(WeaponType.Snowball);
         }
 
+        UpdateHealthBar();
+
     }
 
     private IEnumerator DoAttack()
@@ -389,8 +391,10 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
+
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
         playerHealth -= e.CurrentWeapon.Damage;
+        Debug.Log(e.Type+ " Playing " + CurrentWeapon.Type);
         if (Sounds.ContainsKey(e.CurrentWeapon.HitSoundClip))
             Sounds[e.CurrentWeapon.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound", Sounds[e.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
@@ -407,8 +411,10 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
+
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
         playerHealth -= projectile.Damage;
+        Debug.Log("Playing " + projectile.Type);
         if(Sounds.ContainsKey(projectile.HitSoundClip))
             Sounds[projectile.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound",Sounds[projectile.HitSoundClip].clip.length+0.05f);
@@ -450,12 +456,15 @@ public class Player : MonoBehaviour {
         return true;
     }
 
-    void FixedUpdate()
+   
+
+    private void UpdateHealthBar()
     {
         if (playerHealthSlider != null)
         {
-            Debug.Log("Player Health: "+playerHealth);
+            Debug.Log("Player Health: " + playerHealth);
             playerHealthSlider.value = playerHealth;
+            Debug.Log("Bar value" + playerHealthSlider.value);
         }
         else
         {
@@ -471,7 +480,6 @@ public class Player : MonoBehaviour {
         {
             Debug.Log("playerDurabilitySlider is null");
         }
-
     }
 
 
