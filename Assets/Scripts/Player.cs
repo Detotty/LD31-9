@@ -129,7 +129,7 @@ public class Player : MonoBehaviour {
             {
                 playerDurabilityObject.SetActive(true);
             }
-        playerDurabilitySlider.maxValue = CurrentWeapon.BaseDurability;
+        playerDurabilitySlider.maxValue = 100;
         playerDurabilitySlider.value = CurrentWeapon.BaseDurability;
         }
         else
