@@ -13,6 +13,7 @@ public class Player : MonoBehaviour {
     public Sprite WeaponSheet;
     public Slider playerHealthSlider;
     public GameObject playerDurabilityObject;
+    public Text BodyCountTextObject;
         
 
 	// "Physics"
@@ -35,6 +36,7 @@ public class Player : MonoBehaviour {
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
     public float playerHealth = 100f;
     private Slider playerDurabilitySlider;
+    public int PlayerNumber = 1;
 
     private float turntarget = 12f;
     public int faceDir = 1;
@@ -461,6 +463,21 @@ public class Player : MonoBehaviour {
         else
         {
             Debug.Log("playerDurabilitySlider is null");
+        }
+
+        if (BodyCountTextObject != null)
+        {
+            if (PlayerNumber == 1)
+            {
+                BodyCountTextObject.text = "Player 1 : BodyCount " + GameManager.Instance.PlayerOneBodyCount;
+            }else if (PlayerNumber==2){
+                BodyCountTextObject.text = "Player 2 : BodyCount " + GameManager.Instance.PlayerTwoBodyCount;
+            }
+            else
+            {
+                Debug.Log("Unknown Player");
+            }
+           
         }
     }
 

@@ -20,6 +20,9 @@ public class GameManager : MonoBehaviour {
     public Slider playerOneHealthSlider;
     public Slider playerTwoHealthSlider;
     private string waveDefaultText = "Wave: {0}";
+    public GameObject gameOverObject;
+    public int PlayerOneBodyCount;
+    public int PlayerTwoBodyCount; 
 
   
 
@@ -75,19 +78,12 @@ public class GameManager : MonoBehaviour {
 	    }
 	    else
 	    {
-            if (EnemyManager.Instance.Enemies.Count(en => !en.Dead) == 0)
+            if (getPlayerOneHealth() > 0) { 
+            // Reset for Next Wave
+            if (getEnemyCount() == 0)
             {
-                CreateSpawnList();
-                WaveInProgress = false;
-                Wave++;
-                startTimer = 0f;
-                if (playerOneHealthSlider != null)
-                {
-                    playerOneHealthSlider.maxValue = 1000;
-                    playerOneHealthSlider.value = 1000;
-
-                }
-
+                StartWave();
+               
                 if (Wave > 0)
                 {
                     waveDefaultText = "You have have won the Round !";
@@ -95,8 +91,51 @@ public class GameManager : MonoBehaviour {
                 
                 
             }
+            }
+            else
+            {
+                gameOverObject.SetActive(true);
+            }
+        
 	    }
 	}
+
+    public void Restart()
+    {
+        Debug.Log("Restart pressed");
+       
+        //Application.LoadLevel(Application.loadedLevel);
+
+        
+
+    }
+
+
+
+
+    private void StartWave()
+    {
+        CreateSpawnList();
+        WaveInProgress = false;
+        Wave++;
+        startTimer = 0f;
+        
+    }
+
+    float getPlayerOneHealth()
+    {
+        return playerOneHealthSlider.value;
+    }
+
+
+
+    int getEnemyCount()
+    {
+        return EnemyManager.Instance.Enemies.Count(en => !en.Dead);
+
+    }
+
+
 
     void FixedUpdate()
     {

@@ -196,7 +196,11 @@ public class Enemy : MonoBehaviour
             SetWeapon(WeaponType.Snowball);
         }
 
-        if (Health < 0f) Dead = true;
+        if (Health < 0f)
+        {
+            Dead = true;
+            
+        }
     }
 
     internal virtual void DoAI()
@@ -291,6 +295,22 @@ public class Enemy : MonoBehaviour
         Sounds[p.CurrentWeapon.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound", Sounds[p.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
+
+        if (Health <= 0)
+        {
+            if (p.PlayerNumber==1){
+                GameManager.Instance.PlayerOneBodyCount++;
+            }
+            else if (p.PlayerNumber == 2)
+            {
+                GameManager.Instance.PlayerTwoBodyCount++;
+            }else{
+                Debug.Log("Unknown Player ID");
+            }
+        }
+
+
+
     }
 
     internal void HitByProjectile(Projectile projectile)
