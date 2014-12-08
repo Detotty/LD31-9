@@ -12,7 +12,7 @@ public class ItemManager : MonoBehaviour {
     public GameObject ItemPrefab;
     public List<Item> Items = new List<Item>();
 
-    public Sprite WeaponSheet;
+    public List<Sprite> Sprites;
 
 	// Use this for initialization
 	void Start () {
