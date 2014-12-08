@@ -33,6 +33,7 @@ public class Enemy : MonoBehaviour
     // States
     public bool Knockback = false;
     public bool Dead = false;
+    public float OnFire;
 
     // Stats
     public float CooldownModifier;
@@ -196,11 +197,22 @@ public class Enemy : MonoBehaviour
             SetWeapon(WeaponType.Snowball);
         }
 
-        if (Health < 0f)
-        {
-            Dead = true;
+
+       
+       
+           
             
+       
+
+        if (OnFire > 0f)
+        {
+            OnFire -= Time.deltaTime;
+            Health -= 0.02f;
+            transform.FindChild("FireParticles").GetComponent<ParticleSystem>().Emit(20);
         }
+
+        if (Health < 0f) Dead = true;
+
     }
 
     internal virtual void DoAI()
@@ -292,8 +304,10 @@ public class Enemy : MonoBehaviour
 
         if (Dead) return;
         Health -= p.CurrentWeapon.Damage;
+        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
         Sounds[p.CurrentWeapon.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound", Sounds[p.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
+
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
 
         if (Health <= 0)
@@ -311,6 +325,8 @@ public class Enemy : MonoBehaviour
 
 
 
+
+
     }
 
     internal void HitByProjectile(Projectile projectile)
@@ -319,10 +335,17 @@ public class Enemy : MonoBehaviour
 
         if (Dead) return;
         Health -= projectile.Damage;
+        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
         Sounds[projectile.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound", Sounds[projectile.HitSoundClip].clip.length + 0.05f);
+    }
 
-        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.name == "FlamethrowerParticles")
+        {
+            OnFire += 1f;
+        }
     }
 
     void DoKnockback(Vector3 pos, float force)
