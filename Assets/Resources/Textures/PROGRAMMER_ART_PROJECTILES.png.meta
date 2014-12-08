@@ -3,6 +3,7 @@ guid: 7f3009f048ecd544196463b25ec38919
 TextureImporter:
   fileIDToRecycleName:
     21300000: PROGRAMMER_ART_PROJECTILES_0
+    21300002: Carrot
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -51,6 +52,16 @@ TextureImporter:
         y: 3
         width: 10
         height: 10
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Carrot
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 5
+        width: 15
+        height: 7
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}

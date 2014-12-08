@@ -22,12 +22,18 @@ public class Snowman : Enemy {
 
         Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
         Target.y = 0f;
+
+        if(Random.Range(0,2)==0)
+            CurrentWeapon = new Weapon(WeaponType.SnowmanMelee);
+        else
+            CurrentWeapon = new Weapon(WeaponType.Carrot);
+
     }
 
 
     internal override void ToggleWalk(bool walk)
     {
-        if (walk && !armsAnim.IsPlaying("Arms_Attack"))
+        if (walk && !armsAnim.IsPlaying("Arms_Attack") && !armsAnim.IsPlaying("Arms_Throw"))
         {
             legsAnim.Play("Legs_Walk");
             torsoAnim.Play("Torso_Walk");
@@ -51,11 +57,11 @@ public class Snowman : Enemy {
         }
         else
         {
-            if (!armsAnim.IsPlaying("Arms_Attack"))
+            if (!armsAnim.IsPlaying("Arms_Attack") && !armsAnim.IsPlaying("Arms_Throw"))
             {
                 legsAnim.Play("Legs_Idle");
-                torsoAnim.Play("Torso_Walk");
-                headAnim.Play("Head_Walk");
+                torsoAnim.Play("Torso_Idle");
+                headAnim.Play("Head_Idle");
                 armsAnim.Play("Arms_Idle");
             }
             // hairAnim.Play("Hair_" + hairStyle);
@@ -75,13 +81,27 @@ public class Snowman : Enemy {
 
         if (attackCooldown <= 0f)
         {
-            if (Vector3.Distance(transform.position, p1.transform.position) < 2f)
+            switch (CurrentWeapon.Class)
             {
+                case WeaponClass.Throw:
+                    Vector3 forward = new Vector3(faceDir, 0f, 0f).normalized;
+                    if (Vector3.Angle(p1.transform.position - transform.position, forward) < 10f)
+                    {
+                        AttackAnim("Throw");
+                        attackCooldown = CurrentWeapon.Cooldown*CooldownModifier;
+                        StartCoroutine("DoAttack");
+                    }
+                    break;
+                case WeaponClass.Melee:
 
-                //transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
-                AttackAnim("Attack");
-                attackCooldown = 0.5f;
-                StartCoroutine("DoAttack");
+                    if (Vector3.Distance(transform.position, p1.transform.position) < 2f)
+                    {
+                        //transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                        AttackAnim("Attack");
+                        attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
+                        StartCoroutine("DoAttack");
+                    }
+                    break;
             }
         }
 
@@ -115,6 +135,16 @@ public class Snowman : Enemy {
                 Target.y = 0f;
             }
         }
+
+        // Swap weapons occasionally
+        if (Random.Range(0, 500) == 0)
+        {
+            if(CurrentWeapon.Type == WeaponType.SnowmanMelee)
+                CurrentWeapon = new Weapon(WeaponType.Carrot);
+            else
+                CurrentWeapon = new Weapon(WeaponType.SnowmanMelee);
+
+        }
     }
 
     internal override void IdleAnim()
@@ -140,27 +170,32 @@ public class Snowman : Enemy {
      */
    internal override void playPain()
     {
-        Sounds["Snow_man_roar"].Play();
+        if (Sounds.ContainsKey("Snow_man_roar"))
+            Sounds["Snow_man_roar"].Play();
 
     }
 
     internal override void playThrowingWeapon()
     {
-        Sounds["Footsteps_Heavy_Snow"].Play();
+        if (Sounds.ContainsKey("Footsteps_Heavy_Snow"))
+            Sounds["Footsteps_Heavy_Snow"].Play();
     }
 
      internal override void playMeleeWeapon()
     {
-        Sounds["Club"].Play();
+        if (Sounds.ContainsKey("Club"))
+            Sounds["Club"].Play();
     }
 
      internal  override void startWalkingAudio()
     {
-        playWalkAudio(Sounds["Footsteps_Heavy_Snow"]);
+        if (Sounds.ContainsKey("Footsteps_Heavy_Snow"))
+            playWalkAudio(Sounds["Footsteps_Heavy_Snow"]);
     }
 
      internal override void stopWalkingAudio()
     {
-        stopWalkAudio(Sounds["Footsteps_Heavy_Snow"]);
+        if (Sounds.ContainsKey("Footsteps_Heavy_Snow"))
+            stopWalkAudio(Sounds["Footsteps_Heavy_Snow"]);
     }
 }

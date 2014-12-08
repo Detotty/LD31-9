@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using System.Collections;
 
 public enum ProjectileType
 {
-    Snowball
+    Snowball,
+    Carrot
 }
 
 
@@ -17,20 +20,27 @@ public class Projectile : MonoBehaviour
     public float Knockback;
     public float Damage;
 
+    public List<Sprite> Sprites;
+
     private ParticleSystem snowParticles;
 
     private float lifeTime = 0f;
+
+    private int faceDir;
 
 	// Use this for initialization
 	void Start ()
 	{
 	    //snowParticles = GameObject.Find("SnowParticles").GetComponent<ParticleSystem>();
+        
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
 	    lifeTime += Time.deltaTime;
+
+	    transform.localScale = new Vector3(faceDir*5f, 5f, 5f);
 	}
 
     void OnTriggerEnter(Collider other)
@@ -50,6 +60,15 @@ public class Projectile : MonoBehaviour
                 }
 
                 //snowParticles.Emit(transform.position,Vector3.zero,1f,10f,Color.white);
+                break;
+            case ProjectileType.Carrot:
+                //if (transform.FindChild("SnowParticles") != null)
+                //{
+                //    transform.FindChild("SnowParticles").GetComponent<ParticleSystem>().Emit(10);
+                //    Destroy(transform.FindChild("SnowParticles").gameObject,
+                //        transform.FindChild("SnowParticles").GetComponent<ParticleSystem>().duration);
+                //    transform.DetachChildren();
+                //}
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -77,22 +96,31 @@ public class Projectile : MonoBehaviour
         {
             Knockback = ((Enemy)owner).CurrentWeapon.Knockback;
             Damage = ((Enemy)owner).CurrentWeapon.Damage;
+            faceDir = ((Enemy) owner).faceDir;
         }
 
         if (owner is Player)
         {
             Knockback = ((Player) owner).CurrentWeapon.Knockback;
             Damage = ((Player)owner).CurrentWeapon.Damage;
+            faceDir = ((Player)owner).faceDir;
         }
+
+        foreach(Sprite s in Sprites)
+            if (s.name == Type.ToString())
+                GetComponent<SpriteRenderer>().sprite = s;
 
         transform.position = pos;
 
+        
+
+        GameObject pm;
         switch (Type)
         {
             case ProjectileType.Snowball:
                 GetComponent<SpriteRenderer>().sprite = ProjectileManager.Instance.ProjectileSheet;
                 GetComponent<SpriteRenderer>().sprite.name = type.ToString();
-                var pm = (GameObject)Instantiate(ProjectileManager.Instance.SnowParticlesPrefab, transform.position, Quaternion.identity);
+                pm = (GameObject)Instantiate(ProjectileManager.Instance.SnowParticlesPrefab, transform.position, Quaternion.identity);
                 pm.transform.parent = transform;
                 pm.transform.name = "SnowParticles";
                 break;

@@ -28,12 +28,15 @@ public class Player : MonoBehaviour {
     // States
     public bool Knockback = false;
 
+    // Weapon Sprites
+    public List<Sprite> Sprites = new List<Sprite>(); 
+
     // Stats
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
     public float playerHealth = 1000;
 
     private float turntarget = 12f;
-    private int faceDir = 1;
+    public int faceDir = 1;
     private Vector2 actualSize = new Vector2(4f,4f);
     private float fstepTime = 0f;
     internal float attackCooldown = 0f;
@@ -80,12 +83,15 @@ public class Player : MonoBehaviour {
             case WeaponClass.Melee:
 
                 transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(true);
-                transform.FindChild("Body/Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
-
+                foreach (Sprite s in Sprites)
+                    if (s != null && s.name == CurrentWeapon.Type.ToString())
+                        transform.FindChild("Body/Weapon_Swipe").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             case WeaponClass.Throw:
                 transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(true);
-                transform.FindChild("Body/Weapon_Throw").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                foreach (Sprite s in Sprites)
+                    if (s != null && s.name == CurrentWeapon.Type.ToString())
+                        transform.FindChild("Body/Weapon_Throw").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             case WeaponClass.Use:
                 break;
@@ -150,7 +156,7 @@ public class Player : MonoBehaviour {
         Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 0.25f);
 
         attackCooldown -= Time.deltaTime;
-        if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null && attackCooldown<=0f)
+        if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null && CurrentWeapon.Class!= WeaponClass.Use && attackCooldown<=0f)
         {
             switch (CurrentWeapon.Class)
             {
@@ -167,6 +173,12 @@ public class Player : MonoBehaviour {
             attackCooldown = CurrentWeapon.Cooldown;
             StartCoroutine("DoAttack");
         }
+
+        if (Input.GetButton("P1 Weapon") && CurrentWeapon != null && CurrentWeapon.Class == WeaponClass.Use && attackCooldown <= 0f)
+        {
+            UseWeapon();
+        }
+
         if (Input.GetButtonDown("P1 Throw") && CurrentWeapon != null)
         {
             switch (CurrentWeapon.Class)
@@ -228,6 +240,16 @@ public class Player : MonoBehaviour {
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    void UseWeapon()
+    {
+        switch (CurrentWeapon.Type)
+        {
+            case WeaponType.Flamethrower:
+                transform.FindChild("Body/Weapon_Use/FlameThrowerParticles").GetComponent<ParticleSystem>().Emit(5);
+                break;
         }
     }
 

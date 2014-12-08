@@ -39,7 +39,9 @@ public class Enemy : MonoBehaviour
     public float BaseHealth;
     public float Health;
     public bool CanUseWeapons;
-        
+
+    // Weapon Sprites
+    public List<Sprite> Sprites = new List<Sprite>(); 
 
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
 
@@ -189,7 +191,7 @@ public class Enemy : MonoBehaviour
 
         //}
 
-        if (CurrentWeapon!=null && CurrentWeapon.Durability == 0)
+        if (CurrentWeapon!=null && CurrentWeapon.CanBreak && CurrentWeapon.Durability <= 0)
         {
             SetWeapon(WeaponType.Snowball);
         }
@@ -246,7 +248,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private IEnumerator DoAttack()
+    internal virtual IEnumerator DoAttack()
     {
         yield return new WaitForSeconds(0.1f);
 
@@ -280,17 +282,23 @@ public class Enemy : MonoBehaviour
 
     public void HitByMelee(Player p)
     {
-        Health -= p.CurrentWeapon.Damage;
-        DoKnockback(p.transform.position, p.CurrentWeapon.Knockback);
-        playPain();
+        //
 
+        DoKnockback(p.transform.position, p.CurrentWeapon.Knockback);
+
+        if (Dead) return;
+        Health -= p.CurrentWeapon.Damage;
+        playPain();
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
     }
 
     internal void HitByProjectile(Projectile projectile)
     {
-        Health -= projectile.Damage;
         DoKnockback(projectile.transform.position, projectile.Knockback);
+        Health -= projectile.Damage;
+
+        if (Dead) return;
+        
         playPain();
 
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
@@ -357,28 +365,32 @@ public class Enemy : MonoBehaviour
      * 
      */
     internal virtual void playPain(){
-        Sounds["Grunt_Male_pain"].Play();
-    
+        if (Sounds.ContainsKey("Grunt_Male_pain"))
+            Sounds["Grunt_Male_pain"].Play();
     }
 
     internal virtual void playThrowingWeapon()
     {
-        Sounds["Footsteps_Heavy_Snow"].Play();
+        if (Sounds.ContainsKey("Footsteps_Heavy_Snow"))
+            Sounds["Footsteps_Heavy_Snow"].Play();
     }
 
     internal virtual void playMeleeWeapon()
     {
-        Sounds["Club"].Play();
+        if (Sounds.ContainsKey("Club"))
+            Sounds["Club"].Play();
     }
 
     internal virtual void startWalkingAudio()
     {
-        playWalkAudio(Sounds["Footsteps_Light_Snow"]);
+        if (Sounds.ContainsKey("Footsteps_Light_Snow"))
+            playWalkAudio(Sounds["Footsteps_Light_Snow"]);
     }
 
     internal virtual void stopWalkingAudio()
     {
-        stopWalkAudio(Sounds["Footsteps_Light_Snow"]);
+        if (Sounds.ContainsKey("Footsteps_Light_Snow"))
+            stopWalkAudio(Sounds["Footsteps_Light_Snow"]);
     }
 
 
@@ -454,11 +466,15 @@ public class Enemy : MonoBehaviour
         {
             case WeaponClass.Melee:
                 transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(true);
-                transform.FindChild("Body/Weapon_Swipe").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                foreach (Sprite s in Sprites)
+                    if (s!=null && s.name == CurrentWeapon.Type.ToString())
+                        transform.FindChild("Body/Weapon_Swipe").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             case WeaponClass.Throw:
                 transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(true);
-                transform.FindChild("Body/Weapon_Throw").gameObject.GetComponent<SpriteRenderer>().sprite.name = CurrentWeapon.Type.ToString();
+                foreach (Sprite s in Sprites)
+                    if (s != null && s.name == CurrentWeapon.Type.ToString())
+                        transform.FindChild("Body/Weapon_Throw").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             case WeaponClass.Use:
                 break;
