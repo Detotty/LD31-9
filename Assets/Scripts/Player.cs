@@ -12,7 +12,7 @@ public class Player : MonoBehaviour {
     public Transform Sprite;
     public Sprite WeaponSheet;
     public Slider playerHealthSlider;
-    public Slider playerDurabilitySlider;
+    public GameObject playerDurabilityObject;
         
 
 	// "Physics"
@@ -30,7 +30,8 @@ public class Player : MonoBehaviour {
 
     // Stats
     public Dictionary<string, AudioSource> Sounds = new Dictionary<string, AudioSource>();
-    public float playerHealth = 1000;
+    public float playerHealth = 100f;
+    private Slider playerDurabilitySlider;
 
     private float turntarget = 12f;
     private int faceDir = 1;
@@ -46,6 +47,10 @@ public class Player : MonoBehaviour {
     private tk2dSpriteAnimator clothesAnim;
 
 
+
+    void Start(){
+     playerHealthSlider.maxValue = playerHealth;
+    }
     void Awake()
     {
         turntarget = actualSize.x;
@@ -64,7 +69,18 @@ public class Player : MonoBehaviour {
         }
 
         SetWeapon(WeaponType.Snowball);
-        playerDurabilitySlider.maxValue=CurrentWeapon.BaseDurability;
+        playerDurabilitySlider = playerDurabilityObject.transform.FindChild("DurabilitySlider").GetComponent<Slider>();
+
+        if (playerDurabilitySlider != null)
+        {
+            playerDurabilitySlider.maxValue = CurrentWeapon.BaseDurability;
+        }
+        else
+        {
+            Debug.Log("Player.cs --> playerDurabilitySlider is null");
+        }
+
+       
     }
 
     private void SetWeapon(WeaponType type)
@@ -92,10 +108,19 @@ public class Player : MonoBehaviour {
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        if (CurrentWeapon.BaseDurability > 0) { 
+        if (CurrentWeapon.BaseDurability > 0) {
+
+            if (!playerDurabilityObject.activeSelf)
+            {
+                playerDurabilityObject.SetActive(true);
+            }
         playerDurabilitySlider.maxValue = CurrentWeapon.BaseDurability;
         playerDurabilitySlider.value = CurrentWeapon.BaseDurability;
-    }
+        }
+        else
+        {
+            playerDurabilityObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -389,7 +414,7 @@ public class Player : MonoBehaviour {
 
         if (playerDurabilitySlider != null)
         {
-            Debug.Log("Player Durability: " + CurrentWeapon.Durability);
+            //Debug.Log("Player Durability: " + CurrentWeapon.Durability);
             playerDurabilitySlider.value = CurrentWeapon.Durability;
         }
         else

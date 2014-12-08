@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour {
 
                 if (Wave > 0)
                 {
-                    waveDefaultText = "You have have won Round {0} !!";
+                    waveDefaultText = "You have have won the Round !";
                 }
                 
                 
