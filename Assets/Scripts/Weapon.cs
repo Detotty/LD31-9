@@ -31,6 +31,9 @@ public class Weapon
     public bool CanBreak;
     public int Durability;
     public int BaseDurability;
+    public string HitSoundClip;
+    public string SwingSoundClip;
+
 
     public float Range;
 
@@ -49,6 +52,8 @@ public class Weapon
                 Knockback = 100f;
                 CanBreak = false;
                 Damage = 2f;
+                HitSoundClip = "Footsteps_Heavy_Snow";
+                SwingSoundClip = "";
                 break;
             case WeaponType.Stick:
                 BaseDurability = 20;
@@ -59,6 +64,8 @@ public class Weapon
                 CanBreak = true;
                 Damage = 4f;
                 Durability = BaseDurability;
+                HitSoundClip = "Club";
+                SwingSoundClip = "";
                 break;
             case WeaponType.SnowmanMelee:
                 BaseDurability = -1;

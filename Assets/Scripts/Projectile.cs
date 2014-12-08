@@ -19,6 +19,8 @@ public class Projectile : MonoBehaviour
     public object Owner;
     public float Knockback;
     public float Damage;
+    public string HitSoundClip;
+    public string FiringSoundClip;
 
     public List<Sprite> Sprites;
 
@@ -97,6 +99,8 @@ public class Projectile : MonoBehaviour
             Knockback = ((Enemy)owner).CurrentWeapon.Knockback;
             Damage = ((Enemy)owner).CurrentWeapon.Damage;
             faceDir = ((Enemy) owner).faceDir;
+            HitSoundClip = ((Enemy)owner).CurrentWeapon.HitSoundClip;
+            FiringSoundClip = ((Enemy)owner).CurrentWeapon.SwingSoundClip;
         }
 
         if (owner is Player)
@@ -104,6 +108,8 @@ public class Projectile : MonoBehaviour
             Knockback = ((Player) owner).CurrentWeapon.Knockback;
             Damage = ((Player)owner).CurrentWeapon.Damage;
             faceDir = ((Player)owner).faceDir;
+            HitSoundClip = ((Player)owner).CurrentWeapon.HitSoundClip;
+            FiringSoundClip = ((Player)owner).CurrentWeapon.SwingSoundClip;
         }
 
         foreach(Sprite s in Sprites)
