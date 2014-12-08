@@ -156,8 +156,8 @@ public class Weapon
                 CanBreak = true;
                 Damage = 0.1f;
                
-                HitSoundClip = "Club";
-                SwingSoundClip = "";
+                HitSoundClip = "Flame_Stereo";
+                SwingSoundClip = "Flame_Stereo";
                 break;
         }
 

@@ -210,7 +210,14 @@ public class Enemy : MonoBehaviour
         {
             OnFire -= Time.deltaTime;
             Health -= 0.02f;
+
             transform.FindChild("FireParticles").GetComponent<ParticleSystem>().Emit(5);
+
+            if (Health <= 0)
+            {
+                updateBodycount();
+            }
+
         }
 
         if (Health < 0f) Dead = true;
@@ -328,21 +335,21 @@ public class Enemy : MonoBehaviour
 
         if (Health <= 0)
         {
-            if (p.PlayerNumber==1){
-                GameManager.Instance.PlayerOneBodyCount++;
-            }
-            else if (p.PlayerNumber == 2)
-            {
-                GameManager.Instance.PlayerTwoBodyCount++;
-            }else{
-                Debug.Log("Unknown Player ID");
-            }
+            updateBodycount();
         }
 
 
 
 
 
+    }
+
+    private static void updateBodycount()
+    {
+        
+          
+            GameManager.Instance.TeamBodyCount++;
+       
     }
 
     internal void HitByProjectile(Projectile projectile)
@@ -356,6 +363,16 @@ public class Enemy : MonoBehaviour
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
         Sounds[projectile.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound", Sounds[projectile.HitSoundClip].clip.length + 0.05f);
+
+        if (Health <= 0)
+        {
+            updateBodycount();
+        }
+        
+       
+       
+
+
     }
 
     private void OnParticleCollision(GameObject other)
