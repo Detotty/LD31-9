@@ -49,7 +49,8 @@ public class Player : MonoBehaviour {
     private tk2dSpriteAnimator hairAnim;
     private tk2dSpriteAnimator clothesAnim;
 
-
+    internal int headStyle = 0;
+    internal int hairStyle = 0;
 
     void Start(){
      playerHealthSlider.maxValue = playerHealth;
@@ -71,8 +72,8 @@ public class Player : MonoBehaviour {
             Sounds.Add(a.clip.name, a);
         }
 
-        SetWeapon(WeaponType.Snowball);
         playerDurabilitySlider = playerDurabilityObject.transform.FindChild("DurabilitySlider").GetComponent<Slider>();
+        SetWeapon(WeaponType.Flamethrower);
 
         if (playerDurabilitySlider != null)
         {
@@ -83,7 +84,8 @@ public class Player : MonoBehaviour {
             Debug.Log("Player.cs --> playerDurabilitySlider is null");
         }
 
-       
+        hairStyle = Random.Range(0, 3) + 1;
+        headStyle = Random.Range(0, 3) + 1;
     }
 
     private void SetWeapon(WeaponType type)
@@ -92,6 +94,7 @@ public class Player : MonoBehaviour {
 
         transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
         transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
+        transform.FindChild("Body/Weapon_Use").gameObject.SetActive(false);
         //transform.FindChild("Weapon_Use").gameObject.SetActive(false);
             
         switch (CurrentWeapon.Class)
@@ -110,6 +113,10 @@ public class Player : MonoBehaviour {
                         transform.FindChild("Body/Weapon_Throw").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             case WeaponClass.Use:
+                transform.FindChild("Body/Weapon_Use").gameObject.SetActive(true);
+                foreach (Sprite s in Sprites)
+                    if (s != null && s.name == CurrentWeapon.Type.ToString())
+                        transform.FindChild("Body/Weapon_Use").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -179,6 +186,7 @@ public class Player : MonoBehaviour {
         ToggleWalk(rigidbody.velocity.magnitude > 0.01f);
      
         Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 0.25f);
+        transform.FindChild("Body/Weapon_Use/FlamethrowerParticles").rotation = Quaternion.Euler(-12, 90*faceDir, 0f);
 
         attackCooldown -= Time.deltaTime;
         if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null && CurrentWeapon.Class!= WeaponClass.Use && attackCooldown<=0f)
@@ -199,9 +207,12 @@ public class Player : MonoBehaviour {
             StartCoroutine("DoAttack");
         }
 
+        transform.FindChild("Body/Weapon_Use/FlamethrowerLight").gameObject.SetActive(false);
         if (Input.GetButton("P1 Weapon") && CurrentWeapon != null && CurrentWeapon.Class == WeaponClass.Use && attackCooldown <= 0f)
         {
             UseWeapon();
+            if(CurrentWeapon.Type== WeaponType.Flamethrower) 
+                 transform.FindChild("Body/Weapon_Use/FlamethrowerLight").gameObject.SetActive(true);
         }
 
         if (Input.GetButtonDown("P1 Throw") && CurrentWeapon != null)
@@ -273,7 +284,7 @@ public class Player : MonoBehaviour {
         switch (CurrentWeapon.Type)
         {
             case WeaponType.Flamethrower:
-                transform.FindChild("Body/Weapon_Use/FlameThrowerParticles").GetComponent<ParticleSystem>().Emit(5);
+                transform.FindChild("Body/Weapon_Use/FlamethrowerParticles").GetComponent<ParticleSystem>().Emit(20);
                 break;
         }
     }
@@ -284,12 +295,12 @@ public class Player : MonoBehaviour {
         {
             legsAnim.Play("Legs_Walk");
             torsoAnim.Play("Torso_Walk");
-            headAnim.Play("Head_1");
-            hairAnim.Play("Hair_1");
+            headAnim.Play("Head_" + headStyle);
+            hairAnim.Play("Hair_" + hairStyle);
 
-            if (!armsAnim.IsPlaying("Arms_Attack"))
+            if (!armsAnim.IsPlaying("Arms_Attack") && (CurrentWeapon==null || CurrentWeapon.Class!= WeaponClass.Use))
                 armsAnim.Play("Arms_Walk");
-            if (!clothesAnim.IsPlaying("Clothes_Red_Attack"))
+            if (!clothesAnim.IsPlaying("Clothes_Red_Attack") && (CurrentWeapon == null || CurrentWeapon.Class != WeaponClass.Use))
                 clothesAnim.Play("Clothes_Red_Walk");
 
             if (CurrentWeapon != null)
@@ -316,8 +327,8 @@ public class Player : MonoBehaviour {
         {
             legsAnim.Play("Legs_Idle");
             torsoAnim.Play("Torso_Walk");
-            headAnim.Play("Head_1");
-            hairAnim.Play("Hair_1");
+            headAnim.Play("Head_" + headStyle);
+            hairAnim.Play("Hair_" + hairStyle);
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Idle");
@@ -327,6 +338,14 @@ public class Player : MonoBehaviour {
             transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
             transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Stop("Weapon_Walk");
             stopWalkingAudio(Sounds["Footsteps_Light_Snow"]);
+        }
+    }
+
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.name == "FlamethrowerParticles")
+        {
+            Debug.Log("yo");
         }
     }
 
@@ -370,15 +389,11 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
-        Sounds[e.CurrentWeapon.HitSoundClip].Play();
-               
-        StartCoroutine("PlayDamagedSound", Sounds[e.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
-
-
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
-
         playerHealth -= e.CurrentWeapon.Damage;
-
+        if (Sounds.ContainsKey(e.CurrentWeapon.HitSoundClip))
+            Sounds[e.CurrentWeapon.HitSoundClip].Play();
+        StartCoroutine("PlayDamagedSound", Sounds[e.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
     }
 
     internal void HitByProjectile(Projectile projectile)
@@ -392,13 +407,14 @@ public class Player : MonoBehaviour {
 
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
-        Sounds[projectile.HitSoundClip].Play();
+        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
+        playerHealth -= projectile.Damage;
+        if(Sounds.ContainsKey(projectile.HitSoundClip))
+            Sounds[projectile.HitSoundClip].Play();
         StartCoroutine("PlayDamagedSound",Sounds[projectile.HitSoundClip].clip.length+0.05f);
        
 
-        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
-
-        playerHealth -= projectile.Damage;
+       
 
 
     }

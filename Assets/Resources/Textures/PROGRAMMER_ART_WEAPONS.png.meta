@@ -4,6 +4,7 @@ TextureImporter:
   fileIDToRecycleName:
     21300000: Stick
     21300002: Snowball
+    21300004: Flamethrower
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -62,6 +63,16 @@ TextureImporter:
         y: 3
         width: 10
         height: 10
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Flamethrower
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 2
+        width: 29
+        height: 12
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
