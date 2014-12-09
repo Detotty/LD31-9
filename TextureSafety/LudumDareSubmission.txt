@@ -6,6 +6,8 @@ Instead of coal this year, Santa has in fact thrown two bad children into his gl
 
 Fight your way through as many waves of enemies as you can either on your own or with a keyboard buddy, let the bodies pile up as your spectators throw all manner of weaponry and items to keep the entertainment going!
 
+The game can be played by one or two players.
+
 Windows:
 
 Linux:
@@ -15,14 +17,16 @@ Mac:
 To Play:
 
 PLAYER 1 CONTROLS
-WASD - Movement
-??? - Attack
-??? - Discard Weapon
+Cursor Arrows - Movement
+Return - Attack
+Backspace - Discard Weapon
 
 PLAYER 2 CONTROLS
-Cursor Arrows - Movement
-Right Shift - Attack
-Backspace - Discard Weapon
+WASD - Movement
+Space - Attack
+Tab - Discard Weapon
+
+Or use 360 pads - Left stick + A/B
 
 Tools Used:
 Unity/C#

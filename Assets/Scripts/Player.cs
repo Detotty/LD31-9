@@ -568,7 +568,7 @@ public class Player : MonoBehaviour {
 
                 break;
             case ItemType.Food:
-                playerHealth += 25f;
+                playerHealth += 50f;
                 break;
         }
 
