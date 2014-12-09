@@ -1,0 +1,32 @@
+Santa's Seasonal Slayfest
+
+By Gareth Williams (@garethiw), Carl Hughes (@devilqube) and Paul Yendley (@gredgie)
+
+Instead of coal this year, Santa has in fact thrown two bad children into his gladiatorial arena, where they must appease a crowd of elves, twisted from their mindless work in Santa's joyous workshops.
+
+Fight your way through as many waves of enemies as you can either on your own or with a keyboard buddy, let the bodies pile up as your spectators throw all manner of weaponry and items to keep the entertainment going!
+
+Windows:
+
+Linux:
+
+Mac:
+
+To Play:
+
+PLAYER 1 CONTROLS
+WASD - Movement
+??? - Attack
+??? - Discard Weapon
+
+PLAYER 2 CONTROLS
+Cursor Arrows - Movement
+Right Shift - Attack
+Backspace - Discard Weapon
+
+Tools Used:
+Unity/C#
+ASEPRITE
+Photoshop
+Audacity
+Cubase
