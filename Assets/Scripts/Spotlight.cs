@@ -13,7 +13,11 @@ public class Spotlight : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
+	    if (Target.gameObject.activeSelf) GetComponent<Light>().enabled = true;
+        else GetComponent<Light>().enabled = false;
+
         Quaternion lookTarget = Quaternion.LookRotation((Target.position+new Vector3(0f,0f,1f)) - transform.position, Vector3.up);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookTarget, Time.deltaTime * 3f);
 	}

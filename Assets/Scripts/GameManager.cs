@@ -23,9 +23,12 @@ public class GameManager : MonoBehaviour {
     public GameObject gameOverObject;
     public Text TeamBodyCountText;
     public int TeamBodyCount;
-    
 
-  
+    public Transform P1;
+    public Transform P2;
+
+    public Transform P1UI;
+    public Transform P2UI;
 
     List<EnemyType> spawnList = new List<EnemyType>();
     private float startTimer = 0f;
@@ -50,7 +53,13 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
+
+	    if (P1.gameObject.activeSelf) P1UI.gameObject.SetActive(true);
+        else P1UI.gameObject.SetActive(false);
+        if (P2.gameObject.activeSelf) P2UI.gameObject.SetActive(true);
+        else P2UI.gameObject.SetActive(false);
 
 	    if (!WaveInProgress)
 	    {

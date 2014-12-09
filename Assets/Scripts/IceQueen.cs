@@ -68,12 +68,32 @@ class IceQueen : Enemy
 
 
         // Movement
+
+        //reset target to avoid stuckness
+        if (Vector3.Distance(Target, arena.FindChild("Center").position) > 6f && Random.Range(0, 1000) == 0)
+            Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
+
         if (Vector3.Distance(transform.position, Target) < 0.01f)
         {
             if (Random.Range(0, 100) == 0)
             {
                 Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
                 Target.y = 0f;
+            }
+            else if (Random.Range(0, 200) == 0)
+            {
+                int p = Random.Range(0, 2);
+                if (p == 0 && p1.gameObject.activeSelf)
+                {
+                    Target = p1.transform.position + (Random.insideUnitSphere * 1.5f);
+                    Target.y = 0f;
+                }
+                else if (p == 1 && p2.gameObject.activeSelf)
+                {
+                    Target = p2.transform.position + (Random.insideUnitSphere * 1.5f);
+                    Target.y = 0f;
+                }
+
             }
         }
 

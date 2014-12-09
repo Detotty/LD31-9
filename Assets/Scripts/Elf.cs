@@ -18,13 +18,17 @@ class Elf : Enemy
             hairAnim = transform.FindChild("Body/Hair").GetComponent<tk2dSpriteAnimator>();
             clothesAnim = transform.FindChild("Body/Clothes").GetComponent<tk2dSpriteAnimator>();
 
-            CooldownModifier = 2f;
+            CooldownModifier = 4f;
 
             BaseHealth = 10f;
             Health = BaseHealth;
             CanUseWeapons = true;
 
+            
+
             base.Awake();
+
+            //SetWeapon(WeaponType.Molotov);
 
             Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
             Target.y = 0f;

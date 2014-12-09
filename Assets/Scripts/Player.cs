@@ -28,6 +28,7 @@ public class Player : MonoBehaviour {
 
     // States
     public bool Knockback = false;
+    public float OnFire;
 
     // Weapon Sprites
     public List<Sprite> Sprites = new List<Sprite>(); 
@@ -141,8 +142,8 @@ public class Player : MonoBehaviour {
     void Update()
     {
         //Input
-        float h = Input.GetAxis("P1 Horizontal");
-        float v = Input.GetAxis("P1 Vertical");
+        float h = Input.GetAxis("P" + PlayerNumber + " Horizontal");
+        float v = Input.GetAxis("P" + PlayerNumber + " Vertical");
 
         if (h > 0f)
         {
@@ -191,7 +192,7 @@ public class Player : MonoBehaviour {
         transform.FindChild("Body/Weapon_Use/FlamethrowerParticles").rotation = Quaternion.Euler(-12, 90*faceDir, 0f);
 
         attackCooldown -= Time.deltaTime;
-        if (Input.GetButtonDown("P1 Weapon") && CurrentWeapon!=null && CurrentWeapon.Class!= WeaponClass.Use && attackCooldown<=0f)
+        if (Input.GetButtonDown("P"+PlayerNumber+" Weapon") && CurrentWeapon!=null && CurrentWeapon.Class!= WeaponClass.Use && attackCooldown<=0f)
         {
             switch (CurrentWeapon.Class)
             {
@@ -211,7 +212,7 @@ public class Player : MonoBehaviour {
             StartCoroutine("DoAttack");
         }
 
-        if (Input.GetButtonUp("P1 Weapon") && CurrentWeapon.Type== WeaponType.Flamethrower)
+        if (Input.GetButtonUp("P"+PlayerNumber+" Weapon") && CurrentWeapon.Type== WeaponType.Flamethrower)
         {
             if (Sounds[CurrentWeapon.SwingSoundClip].isPlaying)
             {
@@ -227,7 +228,7 @@ public class Player : MonoBehaviour {
                  transform.FindChild("Body/Weapon_Use/FlamethrowerLight").gameObject.SetActive(true);
         }
 
-        if (Input.GetButtonDown("P1 Throw") && CurrentWeapon != null)
+        if (Input.GetButtonDown("P"+ PlayerNumber +" Throw") && CurrentWeapon != null)
         {
             if (CurrentWeapon.Type == WeaponType.Snowball) return;
 
@@ -255,6 +256,16 @@ public class Player : MonoBehaviour {
         {
             SetWeapon(WeaponType.Snowball);
         }
+
+        if (OnFire > 0f)
+        {
+            OnFire -= Time.deltaTime;
+            playerHealth -= 0.1f;
+
+            transform.FindChild("FireParticles").GetComponent<ParticleSystem>().Emit(5);
+        }
+
+        playerHealth = Mathf.Clamp(playerHealth, 0f, 100f);
 
         UpdateHealthBar();
 
@@ -334,8 +345,8 @@ public class Player : MonoBehaviour {
 
             if (!armsAnim.IsPlaying("Arms_Attack") && (CurrentWeapon==null || CurrentWeapon.Class!= WeaponClass.Use))
                 armsAnim.Play("Arms_Walk");
-            if (!clothesAnim.IsPlaying("Clothes_Red_Attack") && (CurrentWeapon == null || CurrentWeapon.Class != WeaponClass.Use))
-                clothesAnim.Play("Clothes_Red_Walk");
+            if (!clothesAnim.IsPlaying("Clothes_" + (PlayerNumber == 1 ? "Red" : "Blue") + "_Attack") && (CurrentWeapon == null || CurrentWeapon.Class != WeaponClass.Use))
+                clothesAnim.Play("Clothes_" + (PlayerNumber == 1 ? "Red" : "Blue") + "_Walk");
 
             if (CurrentWeapon != null)
                 switch (CurrentWeapon.Class)
@@ -366,8 +377,8 @@ public class Player : MonoBehaviour {
 
             if (!armsAnim.IsPlaying("Arms_Attack"))
                 armsAnim.Play("Arms_Idle");
-            if (!clothesAnim.IsPlaying("Clothes_Red_Attack"))
-                clothesAnim.Play("Clothes_Red_Idle");
+            if (!clothesAnim.IsPlaying("Clothes_" + (PlayerNumber == 1 ? "Red" : "Blue") + "_Attack"))
+                clothesAnim.Play("Clothes_" + (PlayerNumber == 1 ? "Red" : "Blue") + "_Idle");
 
             transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Stop("Weapon_Walk");
             transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Stop("Weapon_Walk");
@@ -379,7 +390,7 @@ public class Player : MonoBehaviour {
     {
         if (other.name == "FlamethrowerParticles")
         {
-            Debug.Log("yo");
+            OnFire += 1f;
         }
     }
 
@@ -406,7 +417,7 @@ public class Player : MonoBehaviour {
     void AttackAnim(string anim)
     {
         armsAnim.PlayFromFrame("Arms_Attack",0);
-        clothesAnim.PlayFromFrame("Clothes_Red_Attack",0);
+        clothesAnim.PlayFromFrame("Clothes_" + (PlayerNumber==1?"Red":"Blue") + "_Attack",0);
         if (!"".Equals(CurrentWeapon.SwingSoundClip)){
             Sounds[CurrentWeapon.SwingSoundClip].Play();
         }
@@ -444,6 +455,8 @@ public class Player : MonoBehaviour {
         rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
         Knockback = true;
 
+        if (projectile.Type == ProjectileType.Molotov) OnFire += 5f;
+
         transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
         playerHealth -= projectile.Damage;
         Debug.Log("Playing " + projectile.Type);
@@ -456,6 +469,8 @@ public class Player : MonoBehaviour {
 
 
     }
+
+
 
     IEnumerator PlayDamagedSound(float delay)
     {
@@ -483,6 +498,9 @@ public class Player : MonoBehaviour {
                 //        break;
                 //}
 
+                break;
+            case ItemType.Food:
+                playerHealth += 25f;
                 break;
         }
 

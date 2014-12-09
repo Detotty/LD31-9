@@ -4,7 +4,8 @@ using System.Collections;
 
 public enum ItemType
 {
-    Weapon
+    Weapon,
+    Food
 }
 
 
@@ -32,7 +33,7 @@ public class Item : MonoBehaviour
     {
         if (lifeTime < 1f) return;
 
-        if (other.transform.name == "Kid")
+        if (other.transform.name.Contains("Kid"))
         {
             if(other.GetComponent<Player>().Get(this)) 
                 gameObject.SetActive(false);
@@ -60,6 +61,12 @@ public class Item : MonoBehaviour
                 //GetComponent<SpriteRenderer>().sprite = ItemManager.Instance.WeaponSheet;
                 foreach (Sprite s in ItemManager.Instance.Sprites)
                     if (s.name == w.ToString())
+                        GetComponent<SpriteRenderer>().sprite = s;
+                break;
+            case ItemType.Food:
+                int i = Random.Range(0, 3);
+                foreach (Sprite s in ItemManager.Instance.Sprites)
+                    if (s.name == i.ToString())
                         GetComponent<SpriteRenderer>().sprite = s;
                 break;
         }

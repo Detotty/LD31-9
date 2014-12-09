@@ -77,6 +77,22 @@ public class Spectator : MonoBehaviour
 	                }
 	            }
 	        }
+
+	        if (Random.Range(0, 100) == 0)
+	        {
+	            if (ItemManager.Instance.Items.Count(it => it.gameObject.activeSelf && it.Type == ItemType.Food) < 2)
+	            {
+                    Item i = ItemManager.Instance.SpawnFood();
+                    if (i != null)
+                    {
+                        i.transform.position = transform.position;
+                        Vector3 throwVelocity = ((arenaCenter.position + (Random.insideUnitSphere * 8f)) - transform.position);
+                        // throwVelocity *= 0.6f;
+                        throwVelocity.y = 9f;
+                        i.rigidbody.velocity = throwVelocity;
+                    }
+	            }
+	        }
 	    }
 	}
 }

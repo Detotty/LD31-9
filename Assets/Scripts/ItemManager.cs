@@ -49,6 +49,15 @@ public class ItemManager : MonoBehaviour {
         return i;
     }
 
+    public Item SpawnFood()
+    {
+        Item i = Items.FirstOrDefault(it => !it.gameObject.activeSelf);
+        if (i == null) return null;
+
+        i.Init(ItemType.Food, WeaponType.Snowball, 0);
+        return i;
+    }
+
     internal void Clear()
     {
         foreach (Item p in Items)

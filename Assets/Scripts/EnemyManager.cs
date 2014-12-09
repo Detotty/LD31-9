@@ -10,6 +10,7 @@ public class EnemyManager : MonoBehaviour {
 
     public GameObject ElfPrefab;
     public GameObject SnowmanPrefab;
+    public GameObject IceQueenPrefab;
     public List<Transform> Doors = new List<Transform>(); 
 
     public List<Enemy> Enemies = new List<Enemy>();
@@ -46,6 +47,9 @@ public class EnemyManager : MonoBehaviour {
                 break;
             case EnemyType.Snowman:
                 e = ((GameObject)Instantiate(SnowmanPrefab)).GetComponent<Snowman>();
+                break;
+            case EnemyType.IceQueen:
+                e = ((GameObject)Instantiate(IceQueenPrefab)).GetComponent<IceQueen>();
                 break;
         }
 

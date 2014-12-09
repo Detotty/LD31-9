@@ -87,7 +87,8 @@ public class Enemy : MonoBehaviour
             Sounds.Add(a.clip.name, a);
         }
 
-        p1 = GameObject.Find("Kid").GetComponent<Player>();
+        p1 = GameManager.Instance.P1.GetComponent<Player>();
+        p2 = GameManager.Instance.P2.GetComponent<Player>();
         //p2 = GameObject.Find("Kid").GetComponent<Player>();
 
         arena = GameObject.Find("Arena").transform;
@@ -103,10 +104,12 @@ public class Enemy : MonoBehaviour
             CurrentWeapon = null;
             transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
             transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
+            transform.FindChild("Body/Weapon_Use").gameObject.SetActive(false);
 
             IdleAnim();
 
             Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 1f);
+            
             //Sprite.Rotate(0f,0f,(90f * faceDir) * Time.deltaTime);
 
             transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f,0f,90f * faceDir), Time.deltaTime * 5f);
@@ -114,16 +117,24 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        Player closestPlayer = null;
+        var dist1 = Vector3.Distance(p1.transform.position, transform.position);
+        var dist2 = Vector3.Distance(p2.transform.position, transform.position);
+        if (p1.gameObject.activeSelf && dist1 < dist2) closestPlayer = p1;
+        if (p2.gameObject.activeSelf && dist2 < dist1) closestPlayer = p2;
 
-        if (p1.transform.position.x > transform.position.x)
+        if (closestPlayer != null)
         {
-            turntarget = actualSize.x;
-            faceDir = 1;
-        }
-        if (p1.transform.position.x < transform.position.x)
-        {
-            turntarget = -actualSize.x;
-            faceDir = -1;
+            if (closestPlayer.transform.position.x > transform.position.x)
+            {
+                turntarget = actualSize.x;
+                faceDir = 1;
+            }
+            if (closestPlayer.transform.position.x < transform.position.x)
+            {
+                turntarget = -actualSize.x;
+                faceDir = -1;
+            }
         }
 
         Speed = walkSpeed;
@@ -159,7 +170,8 @@ public class Enemy : MonoBehaviour
         //}
      
         Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 0.25f);
-
+        if (transform.FindChild("Body/Weapon_Use/FlamethrowerParticles")!=null)
+            transform.FindChild("Body/Weapon_Use/FlamethrowerParticles").rotation = Quaternion.Euler(-12, 90 * faceDir, 0f);
         // ARTIFICIAL INTELLIGENCE YO
         // Attack
         DoAI();
@@ -200,12 +212,6 @@ public class Enemy : MonoBehaviour
         }
 
 
-       
-       
-           
-            
-       
-
         if (OnFire > 0f)
         {
             OnFire -= Time.deltaTime;
@@ -227,10 +233,11 @@ public class Enemy : MonoBehaviour
     internal virtual void DoAI()
     {
         attackCooldown -= Time.deltaTime;
+        Vector3 forward = Vector3.zero;
 
         if (CurrentWeapon != null && attackCooldown <= 0f)
         {
-            if (Vector3.Distance(transform.position, p1.transform.position) < CurrentWeapon.Range)
+            if (Vector3.Distance(transform.position, p1.transform.position) < CurrentWeapon.Range && p1.gameObject.activeSelf)
             {
                 if (CurrentWeapon != null)
                 {
@@ -245,13 +252,62 @@ public class Enemy : MonoBehaviour
 
                             break;
                         case WeaponClass.Throw:
-                            Vector3 forward = new Vector3(faceDir, 0f, 0f).normalized;
+                            forward = new Vector3(faceDir, 0f, 0f).normalized;
                             if (Vector3.Angle(p1.transform.position - transform.position, forward) < 10f)
                             {
                                 transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
                                 AttackAnim("Attack");
                                 attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
                                 StartCoroutine("DoAttack");
+                            }
+
+                            break;
+
+                        case WeaponClass.Use:
+                            forward = new Vector3(faceDir, 0f, 0f).normalized;
+                            if (Vector3.Angle(p1.transform.position - transform.position, forward) < 10f)
+                            {
+                                UseWeapon();
+                            }
+
+                            break;
+                    }
+
+
+                }
+            }
+
+            if (Vector3.Distance(transform.position, p2.transform.position) < CurrentWeapon.Range && p2.gameObject.activeSelf)
+            {
+                if (CurrentWeapon != null)
+                {
+                    switch (CurrentWeapon.Class)
+                    {
+                        case WeaponClass.Melee:
+
+                            transform.FindChild("Body/Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                            AttackAnim("Attack");
+                            attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
+                            StartCoroutine("DoAttack");
+
+                            break;
+                        case WeaponClass.Throw:
+                            forward = new Vector3(faceDir, 0f, 0f).normalized;
+                            if (Vector3.Angle(p2.transform.position - transform.position, forward) < 10f)
+                            {
+                                transform.FindChild("Body/Weapon_Throw").GetComponent<Animation>().Play("Weapon_Throw");
+                                AttackAnim("Attack");
+                                attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
+                                StartCoroutine("DoAttack");
+                            }
+
+                            break;
+
+                        case WeaponClass.Use:
+                            forward = new Vector3(faceDir, 0f, 0f).normalized;
+                            if (Vector3.Angle(p2.transform.position - transform.position, forward) < 10f)
+                            {
+                                UseWeapon();
                             }
 
                             break;
@@ -263,6 +319,11 @@ public class Enemy : MonoBehaviour
         }
 
         // Movement
+
+        //reset target to avoid stuckness
+        if (Vector3.Distance(Target, arena.FindChild("Center").position)>6f && Random.Range(0, 1000) == 0)
+            Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
+
         if (Vector3.Distance(transform.position, Target) < 0.01f)
         {
             if (Random.Range(0, 100) == 0)
@@ -270,19 +331,29 @@ public class Enemy : MonoBehaviour
                 Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
                 Target.y = 0f;
             }
-            else if (Random.Range(0, 100) == 0 && CanUseWeapons)
+            else if (Random.Range(0, 250) == 0 && CanUseWeapons)
             {
-                List<Item> stuff = ItemManager.Instance.Items.Where(it => it.Type == ItemType.Weapon).ToList();
+                List<Item> stuff = ItemManager.Instance.Items.Where(it => it.Type == ItemType.Weapon && it.gameObject.activeSelf).ToList();
                 if (stuff.Count > 0)
                 {
                     Target = stuff[Random.Range(0, stuff.Count)].transform.position;
                     Target.y = 0f;
                 }
             }
-            else if (Random.Range(0, 100) == 0)
+            else if (Random.Range(0, 200) == 0)
             {
-                Vector3 targ = p1.transform.position + (Random.insideUnitSphere*1.5f);
-                Target.y = 0f;
+                int p = Random.Range(0, 2);
+                if (p == 0 && p1.gameObject.activeSelf)
+                {
+                    Target = p1.transform.position + (Random.insideUnitSphere*1.5f);
+                    Target.y = 0f;
+                }
+                else if (p == 1 && p2.gameObject.activeSelf)
+                {
+                    Target = p2.transform.position + (Random.insideUnitSphere * 1.5f);
+                    Target.y = 0f;
+                }
+
             }
         }
     }
@@ -319,6 +390,19 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    internal virtual void UseWeapon()
+    {
+        switch (CurrentWeapon.Type)
+        {
+            case WeaponType.Flamethrower:
+                transform.FindChild("Body/Weapon_Use/FlamethrowerParticles").GetComponent<ParticleSystem>().Emit(20);
+                //playSwingingAudio();
+                break;
+        }
+
+        CurrentWeapon.Durability--;
+    }
+
     public void HitByMelee(Player p)
     {
         //
@@ -337,10 +421,6 @@ public class Enemy : MonoBehaviour
         {
             updateBodycount();
         }
-
-
-
-
 
     }
 
@@ -544,13 +624,13 @@ public class Enemy : MonoBehaviour
 
 
 
-    private void SetWeapon(WeaponType type)
+    internal void SetWeapon(WeaponType type)
     {
         CurrentWeapon = new Weapon(type);
 
         transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
         transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
-        //transform.FindChild("Weapon_Use").gameObject.SetActive(false);
+        transform.FindChild("Body/Weapon_Use").gameObject.SetActive(false);
 
         switch (CurrentWeapon.Class)
         {
@@ -567,6 +647,10 @@ public class Enemy : MonoBehaviour
                         transform.FindChild("Body/Weapon_Throw").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             case WeaponClass.Use:
+                transform.FindChild("Body/Weapon_Use").gameObject.SetActive(true);
+                foreach (Sprite s in Sprites)
+                    if (s != null && s.name == CurrentWeapon.Type.ToString())
+                        transform.FindChild("Body/Weapon_Use").GetComponent<SpriteRenderer>().sprite = s;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
