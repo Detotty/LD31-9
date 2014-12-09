@@ -49,6 +49,8 @@ public class Spectator : MonoBehaviour
 	        rotateTarget = Random.Range(-20f, 20f);
 	    }
 
+	    if (GameManager.Instance.State != GameState.InGame) return;
+
 	    currentThrowTime += Time.deltaTime;
 	    if (currentThrowTime >= ThrowTime&& enableThrow)
 	    {

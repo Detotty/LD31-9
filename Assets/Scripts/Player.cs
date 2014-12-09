@@ -29,6 +29,7 @@ public class Player : MonoBehaviour {
     // States
     public bool Knockback = false;
     public float OnFire;
+    public bool Dead = false;
 
     // Weapon Sprites
     public List<Sprite> Sprites = new List<Sprite>(); 
@@ -130,8 +131,8 @@ public class Player : MonoBehaviour {
             {
                 playerDurabilityObject.SetActive(true);
             }
-        playerDurabilitySlider.maxValue = 100;
-        playerDurabilitySlider.value = CurrentWeapon.BaseDurability;
+            playerDurabilitySlider.maxValue = CurrentWeapon.BaseDurability;
+            //playerDurabilitySlider.value = CurrentWeapon.BaseDurability;
         }
         else
         {
@@ -141,6 +142,25 @@ public class Player : MonoBehaviour {
 
     void Update()
     {
+        if (Dead)
+        {
+            CurrentWeapon = null;
+            transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
+            transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
+            if (transform.FindChild("Body/Weapon_Use") != null)
+                transform.FindChild("Body/Weapon_Use").gameObject.SetActive(false);
+
+            ToggleWalk(false);
+
+            Sprite.localScale = Vector3.Lerp(Sprite.transform.localScale, new Vector3(turntarget, actualSize.y, 1f), 1f);
+
+            //Sprite.Rotate(0f,0f,(90f * faceDir) * Time.deltaTime);
+
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f, 0f, 90f * faceDir), Time.deltaTime * 5f);
+
+            return;
+        }
+
         //Input
         float h = Input.GetAxis("P" + PlayerNumber + " Horizontal");
         float v = Input.GetAxis("P" + PlayerNumber + " Vertical");
@@ -267,6 +287,11 @@ public class Player : MonoBehaviour {
 
         playerHealth = Mathf.Clamp(playerHealth, 0f, 100f);
 
+        if (playerHealth <= 0)
+        {
+            Dead = true;
+        }
+
         UpdateHealthBar();
 
     }
@@ -287,6 +312,25 @@ public class Player : MonoBehaviour {
                         e.HitByMelee(this);
                         CurrentWeapon.Durability--;
                     }
+
+                if (PlayerNumber == 1 && GameManager.Instance.P2.gameObject.activeSelf)
+                {
+                    if (Vector3.Distance(testPos, GameManager.Instance.P2.transform.position + new Vector3(0f, 1f, 0f)) < CurrentWeapon.Range && !GameManager.Instance.P2.GetComponent<Player>().Dead)
+                    {
+                        GameManager.Instance.P2.GetComponent<Player>().HitByMelee(this);
+                        CurrentWeapon.Durability--;
+                    }
+                }
+
+                if (PlayerNumber == 2 && GameManager.Instance.P1.gameObject.activeSelf)
+                {
+                    if (Vector3.Distance(testPos, GameManager.Instance.P1.transform.position + new Vector3(0f, 1f, 0f)) < CurrentWeapon.Range && !GameManager.Instance.P1.GetComponent<Player>().Dead)
+                    {
+                        GameManager.Instance.P1.GetComponent<Player>().HitByMelee(this);
+                        CurrentWeapon.Durability--;
+                    }
+                }
+                
                 break;
             case WeaponClass.Throw:
                 playSwingingAudio();
@@ -390,7 +434,7 @@ public class Player : MonoBehaviour {
     {
         if (other.name == "FlamethrowerParticles")
         {
-            OnFire += 1f;
+            OnFire += 0.1f;
         }
     }
 
@@ -424,23 +468,47 @@ public class Player : MonoBehaviour {
 
     }
 
-    public void HitByMelee(Enemy e)
+    public void HitByMelee(object owner)
     {
+        
         if (Knockback) return;
 
-        Vector3 hitAngle = (transform.position - e.transform.position);
-        hitAngle.y = Random.Range(0.5f, 1.5f);
-        hitAngle.Normalize();
+        if (owner is Player)
+        {
+            Vector3 hitAngle = (transform.position - ((Player) owner).transform.position);
+            hitAngle.y = Random.Range(0.5f, 1.5f);
+            hitAngle.Normalize();
 
-        rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
-        Knockback = true;
+            rigidbody.AddForceAtPosition(hitAngle*100f, transform.position);
+            Knockback = true;
 
-        transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
-        playerHealth -= e.CurrentWeapon.Damage;
-        Debug.Log(e.Type+ " Playing " + CurrentWeapon.Type);
-        if (Sounds.ContainsKey(e.CurrentWeapon.HitSoundClip))
-            Sounds[e.CurrentWeapon.HitSoundClip].Play();
-        StartCoroutine("PlayDamagedSound", Sounds[e.CurrentWeapon.HitSoundClip].clip.length + 0.05f);
+            if (Dead) return;
+
+            transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
+            playerHealth -= ((Player)owner).CurrentWeapon.Damage;
+            //Debug.Log(((Player)owner).Type + " Playing " + CurrentWeapon.Type);
+            if (Sounds.ContainsKey(((Player)owner).CurrentWeapon.HitSoundClip))
+                Sounds[((Player)owner).CurrentWeapon.HitSoundClip].Play();
+            StartCoroutine("PlayDamagedSound", Sounds[((Player)owner).CurrentWeapon.HitSoundClip].clip.length + 0.05f);
+        }
+        else
+        {
+            Vector3 hitAngle = (transform.position - ((Enemy)owner).transform.position);
+            hitAngle.y = Random.Range(0.5f, 1.5f);
+            hitAngle.Normalize();
+
+            rigidbody.AddForceAtPosition(hitAngle * 100f, transform.position);
+            Knockback = true;
+
+            if (Dead) return;
+
+            transform.FindChild("BloodParticles").GetComponent<ParticleSystem>().Emit(10);
+            playerHealth -= ((Enemy)owner).CurrentWeapon.Damage;
+            //Debug.Log(((Player)owner).Type + " Playing " + CurrentWeapon.Type);
+            if (Sounds.ContainsKey(((Enemy)owner).CurrentWeapon.HitSoundClip))
+                Sounds[((Enemy)owner).CurrentWeapon.HitSoundClip].Play();
+            StartCoroutine("PlayDamagedSound", Sounds[((Enemy)owner).CurrentWeapon.HitSoundClip].clip.length + 0.05f);
+        }
     }
 
     internal void HitByProjectile(Projectile projectile)

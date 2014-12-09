@@ -104,7 +104,8 @@ public class Enemy : MonoBehaviour
             CurrentWeapon = null;
             transform.FindChild("Body/Weapon_Swipe").gameObject.SetActive(false);
             transform.FindChild("Body/Weapon_Throw").gameObject.SetActive(false);
-            transform.FindChild("Body/Weapon_Use").gameObject.SetActive(false);
+            if (transform.FindChild("Body/Weapon_Use")!=null)
+                transform.FindChild("Body/Weapon_Use").gameObject.SetActive(false);
 
             IdleAnim();
 
@@ -379,8 +380,10 @@ public class Enemy : MonoBehaviour
             case WeaponClass.Melee:
                 Vector3 testPos = transform.position + new Vector3((float)faceDir * 0.5f, 1f, 0f);
                 playMeleeWeapon();
-                    if (Vector3.Distance(testPos, p1.transform.position) < CurrentWeapon.Range)
-                        p1.HitByMelee(this);
+                if (p1.gameObject.activeSelf && Vector3.Distance(testPos, p1.transform.position) < CurrentWeapon.Range)
+                    p1.HitByMelee(this);
+                if (p2.gameObject.activeSelf && Vector3.Distance(testPos, p2.transform.position) < CurrentWeapon.Range)
+                    p2.HitByMelee(this);
                 break;
             case WeaponClass.Throw:
                 Projectile p = ProjectileManager.Instance.Spawn(CurrentWeapon.ProjectileType, transform.position + new Vector3((float)faceDir * 0.3f, 1f, 0f), this);
@@ -469,7 +472,7 @@ public class Enemy : MonoBehaviour
     {
         if (other.name == "FlamethrowerParticles")
         {
-            OnFire += 1f;
+            OnFire += 0.5f;
         }
     }
 

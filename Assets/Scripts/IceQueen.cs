@@ -60,6 +60,13 @@ class IceQueen : Enemy
                         attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
                         StartCoroutine("DoAttack");
                     }
+                    if (Vector3.Distance(transform.position, p2.transform.position) < 2f)
+                    {
+                        //transform.FindChild("Weapon_Swipe").GetComponent<Animation>().Play("Weapon_Swipe");
+                        AttackAnim("Attack");
+                        attackCooldown = CurrentWeapon.Cooldown * CooldownModifier;
+                        StartCoroutine("DoAttack");
+                    }
                     break;
             }
         }

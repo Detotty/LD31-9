@@ -90,7 +90,7 @@ public class Projectile : MonoBehaviour
 
         gameObject.SetActive(false);
 
-        if (other.transform.name.Contains("Kid") && !(Owner is Player))
+        if (other.transform.name.Contains("Kid"))// && !(Owner is Player))
         {
             other.GetComponent<Player>().HitByProjectile(this);
                 
