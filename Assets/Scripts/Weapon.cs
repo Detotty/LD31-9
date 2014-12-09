@@ -93,7 +93,7 @@ public class Weapon
                 CanBreak = true;
                 Damage = 6f;
 
-                HitSoundClip = "Club";
+                HitSoundClip = "knife";
                 SwingSoundClip = "";
                 break;
             case WeaponType.Molotov:
@@ -105,7 +105,7 @@ public class Weapon
                 Knockback = 100f;
                 CanBreak = true;
                 Damage = 1f;
-                HitSoundClip = "Club";
+                HitSoundClip = "Molotov_break_burn";
 
                 SwingSoundClip = "";
                 break;

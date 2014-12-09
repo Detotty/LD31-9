@@ -224,6 +224,13 @@ public class Enemy : MonoBehaviour
                 updateBodycount();
             }
 
+            if(Type == EnemyType.Elf)
+                if (Random.Range(0, 100) == 0 && !Sounds["Burning_Elf"].isPlaying)
+                {
+                    Sounds["Burning_Elf"].pitch = Random.Range(0.8f, 1.2f);
+                    Sounds["Burning_Elf"].Play();
+                }
+
         }
 
         if (Health < 0f) Dead = true;
@@ -321,8 +328,11 @@ public class Enemy : MonoBehaviour
         // Movement
 
         //reset target to avoid stuckness
-        if (Vector3.Distance(Target, arena.FindChild("Center").position)>6f && Random.Range(0, 1000) == 0)
-            Target = arena.FindChild("Center").position + (Random.insideUnitSphere * 6f);
+        if (Vector3.Distance(Target, arena.FindChild("Center").position) > 6f && Random.Range(0, 1000) == 0)
+        {
+            Target = arena.FindChild("Center").position + (Random.insideUnitSphere*6f);
+            Target.y = 0f;
+        }
 
         if (Vector3.Distance(transform.position, Target) < 0.01f)
         {
